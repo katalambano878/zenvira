@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import PageHero from '@/components/PageHero';
 
 const categories = [
   {
@@ -114,19 +115,20 @@ export default function HelpCenterPage() {
     <>
       <Header />
       <main className="min-h-screen bg-gray-50">
-        <div className="bg-gradient-to-br from-blue-700 to-blue-900 text-white py-16">
-          <div className="max-w-4xl mx-auto px-4 text-center">
-            <h1 className="text-4xl font-bold mb-4">How can we help you?</h1>
-            <p className="text-blue-100 mb-8 text-lg">Search our help center or browse by category</p>
-            
-            <div className="relative max-w-2xl mx-auto">
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search for articles..."
-                className="w-full px-6 py-4 pl-14 rounded-xl text-gray-900 text-lg focus:outline-none focus:ring-4 focus:ring-blue-300"
-              />
+        <PageHero
+          title="How can we help you?"
+          subtitle="Search our help center or browse by category"
+          backgroundImage="/zenvira-page-hero-3.png"
+        />
+        <div className="max-w-2xl mx-auto px-4 -mt-16 relative z-20 pb-8">
+          <div className="relative">
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search for articles..."
+              className="w-full px-6 py-4 pl-14 rounded-xl text-gray-900 text-lg focus:outline-none focus:ring-4 focus:ring-blue-300 shadow-xl border border-gray-100 bg-white"
+            />
               <i className="ri-search-line absolute left-5 top-1/2 -translate-y-1/2 text-2xl text-gray-400"></i>
               {searchQuery && (
                 <button
@@ -162,7 +164,6 @@ export default function HelpCenterPage() {
                 <p className="text-sm text-gray-600 mt-1">Try different keywords or browse categories below</p>
               </div>
             )}
-          </div>
         </div>
 
         <div className="max-w-7xl mx-auto px-4 py-12">

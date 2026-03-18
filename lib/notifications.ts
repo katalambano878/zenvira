@@ -1,17 +1,35 @@
 import { Resend } from 'resend';
 import { supabase } from '@/lib/supabase';
 import { escapeHtml } from '@/lib/sanitize';
+import {
+    getSiteName,
+    getSiteTagline,
+    getContactPhoneTel,
+    getContactPhoneDisplay,
+    getServerAdminEmail,
+    getServerEmailFrom,
+    getSmsSenderId,
+} from '@/lib/site-defaults';
 
 const resend = new Resend(process.env.RESEND_API_KEY || 'missing_api_key');
-const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'tiwaperfumestyle@gmail.com';
-const EMAIL_FROM = process.env.EMAIL_FROM || 'TIWAA PERFUME STYLE HOUSE <tiwaperfumestyle@gmail.com>';
+const ADMIN_EMAIL = getServerAdminEmail();
+const EMAIL_FROM = getServerEmailFrom();
 const BRAND = {
-    name: 'TIWAA PERFUME STYLE HOUSE',
+    get name() {
+        return getSiteName();
+    },
     color: '#2563eb',
     colorLight: '#eff6ff',
     colorDark: '#064e3b',
-    url: (process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000').replace(/\/+$/, ''),
-    phone: '+233545010949',
+    get url() {
+        return (process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000').replace(/\/+$/, '');
+    },
+    get phone() {
+        return getContactPhoneTel();
+    },
+    get phoneLabel() {
+        return getContactPhoneDisplay() || getContactPhoneTel() || '';
+    },
 };
 
 // Reusable branded email layout
@@ -30,7 +48,7 @@ ${preheader ? `<span style="display:none;max-height:0;overflow:hidden;">${prehea
 <!-- Header -->
 <tr><td style="background:linear-gradient(135deg,${BRAND.color},${BRAND.colorDark});padding:32px 40px;text-align:center;">
 <h1 style="margin:0;color:#ffffff;font-size:22px;font-weight:700;letter-spacing:0.5px;">${BRAND.name}</h1>
-<p style="margin:6px 0 0;color:rgba(255,255,255,0.8);font-size:12px;letter-spacing:1.5px;text-transform:uppercase;">Perfumes · Wholesale & Retail</p>
+<p style="margin:6px 0 0;color:rgba(255,255,255,0.8);font-size:12px;letter-spacing:1.5px;text-transform:uppercase;">${getSiteTagline()}</p>
 </td></tr>
 
 <!-- Body -->
@@ -42,7 +60,7 @@ ${body}
 <tr><td style="background-color:#f9fafb;padding:24px 40px;border-top:1px solid #e5e7eb;">
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
 <tr><td style="text-align:center;">
-<p style="margin:0 0 8px;color:#6b7280;font-size:13px;">Need help? Contact us at <a href="tel:${BRAND.phone}" style="color:${BRAND.color};text-decoration:none;">${BRAND.phone}</a></p>
+<p style="margin:0 0 8px;color:#6b7280;font-size:13px;">${BRAND.phone ? `Need help? <a href="tel:${BRAND.phone}" style="color:${BRAND.color};text-decoration:none;">${BRAND.phoneLabel}</a>` : `Need help? <a href="${BRAND.url}/contact" style="color:${BRAND.color};text-decoration:none;">Contact us</a>`}</p>
 <p style="margin:0 0 12px;color:#6b7280;font-size:13px;"><a href="${BRAND.url}" style="color:${BRAND.color};text-decoration:none;">Visit our store</a> &nbsp;·&nbsp; <a href="${BRAND.url}/order-tracking" style="color:${BRAND.color};text-decoration:none;">Track order</a></p>
 <p style="margin:0;color:#9ca3af;font-size:11px;">&copy; ${new Date().getFullYear()} ${BRAND.name}. All rights reserved.</p>
 </td></tr>
@@ -154,7 +172,7 @@ export async function sendSMS({ to, message }: { to: string; message: string }) 
             },
             body: JSON.stringify({
                 type: 1,
-                senderid: 'TIWAA',
+                senderid: getSmsSenderId(),
                 messages: [
                     {
                         recipient: recipient,
@@ -296,7 +314,7 @@ ${emailButton('View Order in Admin', `${baseUrl}/admin/orders/${id}`)}
     if (phone) {
         const smsMessage = trackingNumber
             ? `Hi ${name}, your order #${order_number || id} is confirmed! Tracking: ${trackingNumber}. Track here: ${trackingUrl}${shippingNotesSms}`
-            : `Hi ${name}, your order #${order_number || id} at TIWAA PERFUME STYLE HOUSE is confirmed! Track here: ${trackingUrl}${shippingNotesSms}`;
+            : `Hi ${name}, your order #${order_number || id} at ${getSiteName()} is confirmed! Track here: ${trackingUrl}${shippingNotesSms}`;
 
         await sendSMS({
             to: phone,
@@ -406,7 +424,7 @@ export async function sendWelcomeMessage(user: { email: string, firstName: strin
   <p style="margin:0;color:#6b7280;font-size:15px;">We're so glad you're here.</p>
 </div>
 
-<p style="color:#374151;font-size:14px;line-height:1.7;margin:16px 0;">Thank you for joining the ${BRAND.name} family. We offer premium quality perfumes at competitive prices &mdash; for resellers and individual customers.</p>
+<p style="color:#374151;font-size:14px;line-height:1.7;margin:16px 0;">Thank you for joining ${BRAND.name}. We&apos;re glad to have you &mdash; browse our store and reach out anytime if you need help.</p>
 
 <div style="background-color:#f9fafb;border-radius:12px;padding:20px;margin:20px 0;">
   <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
@@ -438,7 +456,7 @@ ${emailButton('Start Shopping', `${BRAND.url}/shop`)}
     if (phone) {
         await sendSMS({
             to: phone,
-            message: `Welcome ${firstName}! Thanks for joining TIWAA PERFUME STYLE HOUSE.`
+            message: `Welcome ${firstName}! Thanks for joining ${getSiteName()}.`
         });
     }
 }

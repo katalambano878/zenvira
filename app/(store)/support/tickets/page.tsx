@@ -18,7 +18,7 @@ const mockTickets = [
   },
   {
     id: 'TKT-2024-0032',
-    subject: 'Delivery delayed for order #ORD-2024-156',
+    subject: 'Delivery delayed for order #ORD-EXAMPLE-001',
     category: 'Delivery Problem',
     priority: 'normal',
     status: 'in_progress',

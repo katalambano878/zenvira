@@ -27,18 +27,19 @@
     "tailwindcss": "^3.4.17",
     "typescript": "^5"
   },
-  "name": "tiwaa-perfume-style-house",
+  "name": "web-storefront",
+  "description": "Next.js e-commerce storefront (configure via env)",
   "private": true,
   "scripts": {
     "build": "next build",
-    "dev": "cross-env NODE_ENV=development next dev -H 0.0.0.0 -p 3000",
+    "dev": "cross-env NODE_ENV=development next dev -H 0.0.0.0 -p 3001",
     "lint": "next lint",
-    "supabase:link": "supabase link --project-ref bskojprmfxugvkycvetc",
+    "supabase:link": "supabase link --project-ref ${SUPABASE_PROJECT_REF:-your-project-ref}",
     "supabase:push": "supabase db push",
-    "supabase:migrate": "supabase link --project-ref bskojprmfxugvkycvetc && supabase db push",
+    "supabase:migrate": "supabase link --project-ref ${SUPABASE_PROJECT_REF:-your-project-ref} && supabase db push",
     "db:migrate": "node scripts/run-migration.mjs",
     "create-admin": "node scripts/create-admin-user.mjs",
-    "vercel": "vercel -Q ./.vercel-cli-config",
+    "vercel": "vercel",
     "images:compress": "node scripts/compress-images.mjs"
   },
   "version": "0.1.0"

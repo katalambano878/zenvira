@@ -4,27 +4,8 @@ import { sendOrderConfirmation } from '@/lib/notifications';
 import { checkRateLimit, getClientIdentifier, RATE_LIMITS } from '@/lib/rate-limit';
 
 /**
- * Moolre Callback Payload Structure (from their actual API):
- * {
- *   "status": 1,
- *   "code": "P01",
- *   "message": "Transaction Successful",
- *   "data": {
- *     "txtstatus": 1,
- *     "payer": "233535998837",
- *     "terminalid": "",
- *     "accountnumber": "10789906062911",
- *     "name": "",
- *     "amount": "2",
- *     "value": "2",
- *     "transactionid": "42252702",
- *     "externalref": "ORD-1770330034217-441",
- *     "thirdpartyref": "74658410493"
- *   },
- *   "secret": "c23bc2ab-...",
- *   "ts": "2026-02-05 22:21:16",
- *   "go": null
- * }
+ * Moolre callback: JSON body with status, code, message, data (payer phone, amount, externalref, etc.), secret, ts.
+ * Field names and shapes follow the provider’s documentation.
  */
 
 export async function POST(req: Request) {

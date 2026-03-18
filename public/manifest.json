@@ -1,1 +1,18 @@
-{"name":"TIWAA PERFUME STYLE HOUSE","short_name":"TIWAA Perfume","description":"I sell perfumes — wholesale and retail. Satellite, Accra. Call 054 501 0949 · WhatsApp 055 416 9992.","start_url":"/?source=pwa","scope":"/","display":"standalone","orientation":"portrait","background_color":"#ffffff","theme_color":"#2563eb","dir":"ltr","lang":"en","categories":["shopping","lifestyle"],"icons":[{"src":"/tiwa logo.png","sizes":"any","type":"image/png","purpose":"any"},{"src":"/tiwa logo.png","sizes":"any","type":"image/png","purpose":"maskable"}],"shortcuts":[{"name":"Shop Products","short_name":"Shop","description":"Browse perfumes","url":"/shop?source=pwa-shortcut","icons":[{"src":"/tiwa logo.png","sizes":"any"}]},{"name":"My Cart","short_name":"Cart","description":"View your shopping cart","url":"/cart?source=pwa-shortcut","icons":[{"src":"/tiwa logo.png","sizes":"any"}]},{"name":"Track Order","short_name":"Track","description":"Track your order status","url":"/order-tracking?source=pwa-shortcut","icons":[{"src":"/tiwa logo.png","sizes":"any"}]},{"name":"My Account","short_name":"Account","description":"View your account","url":"/account?source=pwa-shortcut","icons":[{"src":"/tiwa logo.png","sizes":"any"}]}],"screenshots":[],"prefer_related_applications":false,"related_applications":[]}
+{
+  "name": "Your Store",
+  "short_name": "Store",
+  "description": "Online store. Set NEXT_PUBLIC_SITE_NAME and related env vars to customize.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#2563eb",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/neww.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

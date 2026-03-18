@@ -6,6 +6,13 @@ import { supabase } from '@/lib/supabase';
 import PageHero from '@/components/PageHero';
 import { usePageTitle } from '@/hooks/usePageTitle';
 import { useRecaptcha } from '@/hooks/useRecaptcha';
+import {
+  sanitizeAddressDisplay,
+  getDefaultSocialLinks,
+  getSocialInstagramHandle,
+  getSocialYoutubeHandle,
+  getSocialSnapchatHandle,
+} from '@/lib/site-defaults';
 
 export default function ContactPage() {
   usePageTitle('Contact Us');
@@ -44,7 +51,7 @@ export default function ContactPage() {
     setSubmitStatus('idle');
 
     // reCAPTCHA verification
-    const isHuman = await getToken('contact');
+    const isHuman = (await getToken('contact')).ok;
     if (!isHuman) {
       setSubmitStatus('error');
       setIsSubmitting(false);
@@ -88,50 +95,89 @@ export default function ContactPage() {
   };
 
   // Get contact details from CMS settings
-  const contactEmail = getSetting('contact_email') || 'tiwaperfumestyle@gmail.com';
-  const contactPhone = getSetting('contact_phone') || '0545010949';
-  const contactWhatsapp = getSetting('contact_whatsapp') || '0554169992';
-  const contactAddress = getSetting('contact_address') || 'Satellite, Accra';
+  const contactEmail = getSetting('contact_email') || process.env.NEXT_PUBLIC_CONTACT_EMAIL || 'contact@example.com';
+  const contactPhone = getSetting('contact_phone') || process.env.NEXT_PUBLIC_CONTACT_PHONE || '';
+  const contactWhatsapp = getSetting('contact_whatsapp') || process.env.NEXT_PUBLIC_CONTACT_WHATSAPP || process.env.NEXT_PUBLIC_CONTACT_PHONE || '';
+  const contactAddress = sanitizeAddressDisplay(
+    getSetting('contact_address') || process.env.NEXT_PUBLIC_CONTACT_ADDRESS
+  );
+  const social = getDefaultSocialLinks();
+  const igHandle = getSocialInstagramHandle();
+  const ytHandle = getSocialYoutubeHandle();
+  const scHandle = getSocialSnapchatHandle();
 
   const heroTitle = pageContent?.title || 'Get In Touch';
   const heroSubtitle = pageContent?.subtitle || 'Have a question or need assistance?';
   const heroContent = pageContent?.content || 'Our friendly team is here to help. Reach out through any of our contact channels.';
 
-  const waNumber = contactWhatsapp.replace(/[^0-9]/g, '');
-  const waLink = waNumber.startsWith('0') ? `https://wa.me/233${waNumber.slice(1)}` : `https://wa.me/${waNumber}`;
-  const telNumber = contactPhone.replace(/\s/g, '');
-  const telLink = telNumber.startsWith('0') ? `tel:+233${telNumber.slice(1)}` : `tel:${telNumber}`;
+  const waNumber = (contactWhatsapp || '').replace(/[^0-9]/g, '');
+  const waLink = waNumber ? (waNumber.startsWith('0') ? `https://wa.me/233${waNumber.slice(1)}` : `https://wa.me/${waNumber}`) : '#';
+  const telNumber = (contactPhone || '').replace(/\s/g, '');
+  const telLink = telNumber ? (telNumber.startsWith('0') ? `tel:+233${telNumber.slice(1)}` : `tel:${telNumber}`) : '#';
 
   const contactMethods = [
-    {
-      icon: 'ri-phone-line',
-      title: 'Call Us',
-      value: contactPhone,
-      link: telLink,
-      description: 'Mon-Fri, 8am-6pm GMT'
-    },
+    contactPhone
+      ? {
+          icon: 'ri-phone-line',
+          title: 'Call Us',
+          value: contactPhone,
+          link: telLink,
+          description: 'Mon–Sat 9:00 AM – 7:00 PM (example hours — update in CMS).',
+        }
+      : null,
     {
       icon: 'ri-mail-line',
       title: 'Email Us',
       value: contactEmail,
       link: `mailto:${contactEmail}`,
-      description: 'We respond within 24 hours'
+      description: 'We respond within 24 hours',
+    },
+    contactWhatsapp
+      ? {
+          icon: 'ri-whatsapp-line',
+          title: 'WhatsApp',
+          value: contactWhatsapp,
+          link: waLink,
+          description: 'Chat with us instantly',
+        }
+      : null,
+    contactAddress
+      ? {
+          icon: 'ri-map-pin-line',
+          title: 'Visit Us',
+          value: contactAddress,
+          link: 'https://maps.google.com',
+          description: contactAddress,
+        }
+      : null,
+    {
+      icon: 'ri-instagram-line',
+      title: 'Instagram',
+      value: `@${igHandle.replace(/^@/, '')}`,
+      link: social.instagram,
+      description: 'Follow us for drops & behind the scenes',
     },
     {
-      icon: 'ri-whatsapp-line',
-      title: 'WhatsApp',
-      value: contactWhatsapp,
-      link: waLink,
-      description: 'Chat with us instantly'
+      icon: 'ri-youtube-fill',
+      title: 'YouTube',
+      value: ytHandle.startsWith('@') ? ytHandle : `@${ytHandle}`,
+      link: social.youtube,
+      description: 'Tutorials, launches & more',
     },
     {
-      icon: 'ri-map-pin-line',
-      title: 'Visit Us',
-      value: contactAddress,
-      link: 'https://maps.google.com',
-      description: 'Satellite, Accra'
-    }
-  ];
+      icon: 'ri-snapchat-fill',
+      title: 'Snapchat',
+      value: scHandle,
+      link: social.snapchat,
+      description: 'Add us on Snapchat',
+    },
+  ].filter(Boolean) as Array<{
+    icon: string;
+    title: string;
+    value: string;
+    link: string;
+    description: string;
+  }>;
 
   const faqs = [
     {
@@ -152,12 +198,12 @@ export default function ContactPage() {
     <div className="min-h-screen bg-white">
       <PageHero
         title="Get In Touch"
-        subtitle="Have a question or need assistance? We're here to help from Satellite, Accra."
-        backgroundImage="/Whisk_835b10a10eab0caa2c7419d4a6e01102dr.jpeg"
+        subtitle="Have a question? We're here to help. Mon–Sat 9:00 AM – 7:00 PM. Closed Sundays."
+        backgroundImage="/zenvira-page-hero-3.png"
       />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-16">
           {contactMethods.map((method, index) => (
             <a
               key={index}
@@ -315,17 +361,19 @@ export default function ContactPage() {
               </div>
               <h3 className="text-2xl font-bold mb-3">Need Immediate Help?</h3>
               <p className="text-blue-100 mb-6 leading-relaxed">
-                Our customer support team is available Monday to Friday, 8am-6pm GMT. For urgent matters, reach out via WhatsApp.
+                Our customer support hours are listed above. For urgent matters, use WhatsApp or phone if configured.
               </p>
-              <a
-                href={waLink}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 bg-white text-blue-700 px-6 py-3 rounded-full font-medium hover:bg-blue-50 transition-colors whitespace-nowrap"
-              >
-                <i className="ri-whatsapp-line text-xl"></i>
-                Chat on WhatsApp
-              </a>
+              {waNumber ? (
+                <a
+                  href={waLink}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 bg-white text-blue-700 px-6 py-3 rounded-full font-medium hover:bg-blue-50 transition-colors whitespace-nowrap"
+                >
+                  <i className="ri-whatsapp-line text-xl"></i>
+                  Chat on WhatsApp
+                </a>
+              ) : null}
             </div>
           </div>
         </div>
@@ -345,7 +393,7 @@ export default function ContactPage() {
               </div>
               <div className="flex items-center gap-2">
                 <i className="ri-time-line text-blue-700"></i>
-                <span>Mon-Sat: 9am-6pm</span>
+                <span>Mon–Sat: 9:00 AM – 7:00 PM. Closed Sundays.</span>
               </div>
             </div>
           </div>

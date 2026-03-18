@@ -43,13 +43,10 @@ function AccountContent() {
   const [passwordLoading, setPasswordLoading] = useState(false);
 
   useEffect(() => {
-    async function checkUser() {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) {
-        router.push('/auth/login');
-        return;
-      }
+    let cancelled = false;
 
+    function applySession(session: NonNullable<Awaited<ReturnType<typeof supabase.auth.getSession>>['data']['session']>) {
+      if (!session?.user || cancelled) return;
       setUser(session.user);
       setProfileData({
         firstName: session.user.user_metadata?.first_name || '',
@@ -59,7 +56,29 @@ function AccountContent() {
       });
       setLoading(false);
     }
+
+    async function checkUser() {
+      for (let attempt = 0; attempt < 6; attempt++) {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (cancelled) return;
+        if (session?.user) {
+          applySession(session);
+          return;
+        }
+        if (attempt < 5) await new Promise((r) => setTimeout(r, 100));
+      }
+      if (!cancelled) router.push('/auth/login');
+    }
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (session?.user) applySession(session);
+    });
+
     checkUser();
+    return () => {
+      cancelled = true;
+      subscription.unsubscribe();
+    };
   }, [router]);
 
   const handleUpdateProfile = async (e: React.FormEvent) => {

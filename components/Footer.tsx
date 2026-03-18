@@ -3,6 +3,16 @@
 import Link from 'next/link';
 import { useState } from 'react';
 import { useCMS } from '@/context/CMSContext';
+import {
+  getSiteName,
+  getSiteTagline,
+  getWordmark,
+  getContactEmail,
+  getContactPhoneDisplay,
+  getContactAddress,
+  sanitizeAddressDisplay,
+  getDefaultSocialLinks,
+} from '@/lib/site-defaults';
 
 function FooterSection({ title, children }: { title: string, children: React.ReactNode }) {
   const [isOpen, setIsOpen] = useState(false);
@@ -26,19 +36,22 @@ function FooterSection({ title, children }: { title: string, children: React.Rea
 export default function Footer() {
   const { getSetting } = useCMS();
 
-  const siteName = getSetting('site_name') || 'TIWAA PERFUME STYLE HOUSE';
-  const siteTagline = getSetting('site_tagline') || 'I sell perfumes — Wholesale and retail.';
-  const contactEmail = getSetting('contact_email') || 'tiwaperfumestyle@gmail.com';
-  const contactPhone = getSetting('contact_phone') || '0545010949';
-  const contactWhatsapp = getSetting('contact_whatsapp') || '0554169992';
-  const contactAddress = getSetting('contact_address') || 'Satellite, Accra';
-  const siteLogo = getSetting('site_logo') || '/tiwa logo.png';
+  const siteName = getSetting('site_name') || getSiteName();
+  const siteTagline = getSetting('site_tagline') || getSiteTagline();
+  const contactEmail = getSetting('contact_email') || getContactEmail();
+  const contactPhone = getSetting('contact_phone') || getContactPhoneDisplay();
+  const contactWhatsapp = getSetting('contact_whatsapp') || process.env.NEXT_PUBLIC_CONTACT_WHATSAPP || getContactPhoneDisplay();
+  const contactAddress = sanitizeAddressDisplay(
+    getSetting('contact_address') || getContactAddress()
+  );
+  const wordmark = getSetting('wordmark') || getWordmark();
+  const socialDefaults = getDefaultSocialLinks();
   const socialFacebook = getSetting('social_facebook') || '';
-  const socialInstagram = getSetting('social_instagram') || '';
+  const socialInstagram = getSetting('social_instagram') || socialDefaults.instagram;
   const socialTwitter = getSetting('social_twitter') || '';
   const socialTiktok = getSetting('social_tiktok') || '';
-  const socialSnapchat = getSetting('social_snapchat') || '';
-  const socialYoutube = getSetting('social_youtube') || '';
+  const socialSnapchat = getSetting('social_snapchat') || socialDefaults.snapchat;
+  const socialYoutube = getSetting('social_youtube') || socialDefaults.youtube;
 
   return (
     <footer className="relative mt-12 z-0">
@@ -55,27 +68,30 @@ export default function Footer() {
 
             {/* Brand Column */}
             <div className="lg:col-span-1 space-y-6">
-              <Link href="/" className="inline-block group">
-                <img src={siteLogo} alt={siteName} className="h-16 w-auto object-contain drop-shadow-lg group-hover:scale-105 transition-transform duration-300" />
+              <Link href="/" className="inline-block group" aria-label={`${wordmark} — home`}>
+                <span className="font-['Pacifico'] text-4xl sm:text-5xl text-white drop-shadow-lg group-hover:scale-105 transition-transform duration-300 inline-block origin-left">
+                  {wordmark}
+                </span>
               </Link>
               <p className="text-blue-200/60 leading-relaxed text-sm">
-                {siteTagline} Satellite, Accra. Call {contactPhone} · WhatsApp {contactWhatsapp}
+                {[siteTagline, contactAddress || null, contactPhone ? `Tel: ${contactPhone}` : null, (contactWhatsapp && contactWhatsapp !== contactPhone) ? `WhatsApp: ${contactWhatsapp}` : null].filter(Boolean).join(' · ') || `${siteTagline}.`}
               </p>
 
-              <div className="flex gap-3 pt-2">
+              <div className="flex flex-wrap gap-3 pt-2">
                 {[
-                  { link: socialInstagram, icon: 'ri-instagram-line' },
-                  { link: socialTiktok, icon: 'ri-tiktok-fill' },
-                  { link: socialSnapchat, icon: 'ri-snapchat-fill' },
-                  { link: socialYoutube, icon: 'ri-youtube-fill' },
-                  { link: socialTwitter, icon: 'ri-twitter-x-fill' },
-                  { link: socialFacebook, icon: 'ri-facebook-fill' }
+                  { link: socialInstagram, icon: 'ri-instagram-line', label: 'Instagram' },
+                  { link: socialYoutube, icon: 'ri-youtube-fill', label: 'YouTube' },
+                  { link: socialSnapchat, icon: 'ri-snapchat-fill', label: 'Snapchat' },
+                  { link: socialTiktok, icon: 'ri-tiktok-fill', label: 'TikTok' },
+                  { link: socialTwitter, icon: 'ri-twitter-x-fill', label: 'X' },
+                  { link: socialFacebook, icon: 'ri-facebook-fill', label: 'Facebook' }
                 ].map((social, i) => social.link && (
                   <a
                     key={i}
                     href={social.link}
                     target="_blank"
                     rel="noopener noreferrer"
+                    aria-label={social.label}
                     className="w-10 h-10 bg-blue-900/40 border border-blue-800 rounded-full flex items-center justify-center text-blue-300 hover:bg-blue-500 hover:text-blue-950 hover:border-blue-500 transition-all hover:-translate-y-1"
                   >
                     <i className={social.icon}></i>

@@ -1,15 +1,16 @@
 import Link from 'next/link';
+import PageHero from '@/components/PageHero';
 
 export default function BlogPage() {
   const featuredPost = {
     id: '1',
     title: 'The Ultimate Guide to Online Shopping in Ghana',
     excerpt: 'Everything you need to know about safe, convenient online shopping in Ghana. From payment methods to delivery options, we cover it all.',
-    image: 'https://readdy.ai/api/search-image?query=Modern%20African%20woman%20shopping%20online%20on%20laptop%20in%20bright%20contemporary%20home%20office%20coffee%20cup%20plants%20natural%20light%20relaxed%20lifestyle%20photography%20minimal%20clean%20background&width=1200&height=600&seq=blog1&orientation=landscape',
+    image: '/zenvira-page-hero-1.png',
     category: 'Shopping Tips',
     date: 'December 15, 2024',
     readTime: '8 min read',
-    author: 'Ama Osei'
+    author: 'Staff'
   };
 
   const posts = [
@@ -17,31 +18,31 @@ export default function BlogPage() {
       id: '2',
       title: '10 Must-Have Products for Your Home This Season',
       excerpt: 'Discover the trending products that will elevate your living space and make your home more comfortable and stylish.',
-      image: 'https://readdy.ai/api/search-image?query=Beautiful%20modern%20African%20home%20interior%20with%20stylish%20furniture%20decor%20items%20plants%20bright%20natural%20lighting%20contemporary%20design%20magazine%20quality%20photography&width=800&height=500&seq=blog2&orientation=landscape',
+      image: '/zenvira-page-hero-4.png',
       category: 'Home & Living',
       date: 'December 12, 2024',
       readTime: '6 min read',
-      author: 'Yaw Darko'
+      author: 'Staff'
     },
     {
       id: '3',
       title: 'How to Choose Quality Products: A Buyer\'s Guide',
       excerpt: 'Learn the key indicators of quality products and how to make informed purchasing decisions that offer the best value for your money.',
-      image: 'https://readdy.ai/api/search-image?query=Person%20examining%20product%20quality%20checking%20labels%20and%20details%20in%20bright%20retail%20setting%20closeup%20hands%20inspecting%20merchandise%20professional%20photography%20clean%20background&width=800&height=500&seq=blog3&orientation=landscape',
+      image: '/zenvira-page-hero-5.png',
       category: 'Buying Guide',
       date: 'December 10, 2024',
       readTime: '7 min read',
-      author: 'Kwame Mensah'
+      author: 'Staff'
     },
     {
       id: '1',
       title: 'The Ultimate Guide to Online Shopping in Ghana',
       excerpt: 'Everything you need to know about safe, convenient online shopping in Ghana. From payment methods to delivery options.',
-      image: 'https://readdy.ai/api/search-image?query=Modern%20African%20woman%20shopping%20online%20on%20laptop%20in%20bright%20contemporary%20home%20office%20coffee%20cup%20plants%20natural%20light%20relaxed%20lifestyle%20photography%20minimal%20clean%20background&width=800&height=500&seq=blog1b&orientation=landscape',
+      image: '/zenvira-page-hero-2.png',
       category: 'Shopping Tips',
       date: 'December 15, 2024',
       readTime: '8 min read',
-      author: 'Ama Osei'
+      author: 'Staff'
     }
   ];
 
@@ -56,16 +57,11 @@ export default function BlogPage() {
 
   return (
     <div className="min-h-screen bg-white">
-      <div className="bg-gradient-to-br from-blue-50 via-white to-amber-50 py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="max-w-3xl mx-auto text-center">
-            <h1 className="text-5xl font-bold text-gray-900 mb-6">Our Blog</h1>
-            <p className="text-xl text-gray-600 leading-relaxed">
-              Shopping tips, product guides, and the latest trends to help you make smarter purchasing decisions.
-            </p>
-          </div>
-        </div>
-      </div>
+      <PageHero
+        title="Our Blog"
+        subtitle="Shopping tips, product guides, and the latest trends to help you make smarter purchasing decisions."
+        backgroundImage="/zenvira-page-hero-3.png"
+      />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <Link href={`/blog/${featuredPost.id}`} className="block mb-16 hover:opacity-90 transition-opacity cursor-pointer">

@@ -112,7 +112,7 @@ export default function ProductReviews({ productId }: ProductReviewsProps) {
     }
 
     // reCAPTCHA verification
-    const isHuman = await getToken('review');
+    const isHuman = (await getToken('review')).ok;
     if (!isHuman) {
       alert('Security verification failed. Please try again.');
       return;

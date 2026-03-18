@@ -1,30 +1,34 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Storefront (Next.js)
 
-## Getting Started
+E-commerce storefront with admin, payments, and notifications. Configure branding and contact details via environment variables and the CMS.
 
-First, run the development server:
+## Setup
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+1. Copy `.env.example` to `.env.local` and fill in all values.
+2. Install dependencies: `npm install`
+3. Run dev server: `npm run dev` (default port `3001`)
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Branding (env)
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Set at minimum:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- `NEXT_PUBLIC_APP_URL` — canonical site URL  
+- `NEXT_PUBLIC_SITE_NAME` — store name  
+- `NEXT_PUBLIC_SITE_TAGLINE` — short tagline  
+- `NEXT_PUBLIC_CONTACT_EMAIL` — public contact email  
+- `NEXT_PUBLIC_CONTACT_PHONE` — display phone (optional)  
+- `NEXT_PUBLIC_CONTACT_PHONE_TEL` — E.164-style for `tel:` if different from display (optional)  
+- `NEXT_PUBLIC_CONTACT_WHATSAPP` — WhatsApp digits (optional)  
+- `NEXT_PUBLIC_CONTACT_ADDRESS` — business address (optional)  
+- `NEXT_PUBLIC_SMS_SENDER_ID` — SMS sender ID (e.g. registered with your SMS provider)  
+- `NEXT_PUBLIC_SKU_PREFIX` — auto-SKU prefix for new products  
 
-## Learn More
+Admin email and Resend: `ADMIN_EMAIL`, `EMAIL_FROM`, `RESEND_API_KEY`.
 
-To learn more about Next.js, take a look at the following resources:
+## Stack
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Next.js, Supabase, Tailwind CSS. See `package.json` for scripts.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## License
+
+Replace this section with your own license terms when you publish the project.

@@ -1,4 +1,11 @@
 import { Metadata } from 'next';
+import {
+  getSiteName,
+  getSiteTagline,
+  getDefaultMetaDescription,
+  getDefaultTitleSuffix,
+  getContactPhoneTel,
+} from '@/lib/site-defaults';
 
 interface SEOProps {
   title?: string;
@@ -16,8 +23,8 @@ interface SEOProps {
 }
 
 export function generateMetadata({
-  title = 'TIWAA PERFUME STYLE HOUSE — Perfumes Wholesale & Retail',
-  description = 'I sell perfumes — wholesale and retail. Satellite, Accra. Call 054 501 0949 · WhatsApp 055 416 9992.',
+  title,
+  description,
   keywords = [],
   ogImage,
   ogType = 'website',
@@ -29,40 +36,40 @@ export function generateMetadata({
   author,
   noindex = false
 }: SEOProps): Metadata {
-  const siteUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://tiwaperfumestyle.com';
-  const defaultOgImage = `${siteUrl}/tiwa%20logo.png`;
+  const siteUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://example.com';
+  const defaultOgImage = `${siteUrl}/neww.png`;
   const resolvedOgImage = ogImage || defaultOgImage;
-  const siteName = 'TIWAA PERFUME STYLE HOUSE';
-  const fullTitle = title.includes(siteName) ? title : `${title} | ${siteName}`;
+  const siteName = getSiteName();
+  const resolvedTitle = title ?? getDefaultTitleSuffix();
+  const resolvedDesc = description ?? getDefaultMetaDescription();
+  const fullTitle = resolvedTitle.includes(siteName) ? resolvedTitle : `${resolvedTitle} | ${siteName}`;
 
   const defaultKeywords = [
-    'online shopping ghana',
-    'premium products ghana',
-    'buy online ghana',
-    'ecommerce ghana',
-    'fast delivery ghana',
-    'secure shopping'
+    siteName,
+    getSiteTagline(),
+    'online store',
+    'shopping',
   ];
 
   const allKeywords = [...new Set([...keywords, ...defaultKeywords])];
 
   const metadata: Metadata = {
     title: fullTitle,
-    description,
+    description: resolvedDesc,
     keywords: allKeywords.join(', '),
     authors: author ? [{ name: author }] : undefined,
     openGraph: {
       title: fullTitle,
-      description,
-      images: [{ url: resolvedOgImage, width: 1200, height: 630, alt: title }],
+      description: resolvedDesc,
+      images: [{ url: resolvedOgImage, width: 1200, height: 630, alt: resolvedTitle }],
       type: ogType as any,
       siteName,
-      locale: 'en_GH'
+      locale: 'en'
     },
     twitter: {
       card: 'summary_large_image',
       title: fullTitle,
-      description,
+      description: resolvedDesc,
       images: [resolvedOgImage]
     },
     robots: noindex ? {
@@ -116,7 +123,7 @@ export function generateProductSchema(product: {
     sku: product.sku,
     brand: {
       '@type': 'Brand',
-      name: product.brand || 'PremiumShop'
+      name: product.brand || getSiteName()
     },
     offers: {
       '@type': 'Offer',
@@ -161,30 +168,31 @@ export function generateBreadcrumbSchema(items: { name: string; url: string }[])
 }
 
 export function generateOrganizationSchema() {
-  const siteUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://tiwaperfumestyle.com';
+  const siteUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://example.com';
+  const tel = getContactPhoneTel();
+  const cp: Record<string, unknown> = {
+    '@type': 'ContactPoint',
+    contactType: 'Customer Service',
+    availableLanguage: ['English'],
+  };
+  if (tel) cp.telephone = tel;
   return {
     '@context': 'https://schema.org',
     '@type': 'Organization',
-    name: 'TIWAA PERFUME STYLE HOUSE',
+    name: getSiteName(),
     url: siteUrl,
-    logo: `${siteUrl}/tiwa%20logo.png`,
-    image: `${siteUrl}/tiwa%20logo.png`,
-    contactPoint: {
-      '@type': 'ContactPoint',
-      telephone: '+233545010949',
-      contactType: 'Customer Service',
-      areaServed: 'GH',
-      availableLanguage: ['English']
-    }
+    logo: `${siteUrl}/neww.png`,
+    image: `${siteUrl}/neww.png`,
+    contactPoint: cp,
   };
 }
 
 export function generateWebsiteSchema() {
-  const siteUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://tiwaperfumestyle.com';
+  const siteUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://example.com';
   return {
     '@context': 'https://schema.org',
     '@type': 'WebSite',
-    name: 'TIWAA PERFUME STYLE HOUSE',
+    name: getSiteName(),
     url: siteUrl,
     potentialAction: {
       '@type': 'SearchAction',

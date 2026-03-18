@@ -69,15 +69,16 @@ function ShopContent() {
         const { data, count, error } = await cachedQuery<{ data: any; count: any; error: any }>(
           cacheKey,
           async () => {
+            // Left join categories so products without category_id still load (!inner hid them all)
             let query = supabase
               .from('products')
               .select(`
                 *,
-                categories!inner(name, slug),
-                product_images!product_id(url, position),
+                categories(name, slug),
+                product_images(url, position),
                 product_variants(id, name, price, quantity, option1, option2, image_url)
               `, { count: 'exact' })
-              .order('position', { foreignTable: 'product_images', ascending: true });
+              .eq('status', 'active');
 
             // Search
             if (search) {
@@ -135,15 +136,20 @@ function ShopContent() {
             const to = from + productsPerPage - 1;
             query = query.range(from, to);
 
-            return query as any;
+            const result = await query;
+            return result;
           },
           2 * 60 * 1000 // Cache for 2 minutes
         );
 
-        if (error) throw error;
+        if (error) {
+          console.error('[Shop] Supabase error:', error.message, error.code, error.details, error.hint);
+          throw error;
+        }
 
-        if (data) {
+        if (data && Array.isArray(data)) {
           const formattedProducts = data.map((p: any) => {
+            const imgs = (p.product_images || []).slice().sort((a: { position?: number }, b: { position?: number }) => (a.position ?? 0) - (b.position ?? 0));
             const variants = p.product_variants || [];
             const hasVariants = variants.length > 0;
             const minVariantPrice = hasVariants ? Math.min(...variants.map((v: any) => v.price || p.price)) : undefined;
@@ -169,7 +175,7 @@ function ShopContent() {
               name: p.name,
               price: p.price,
               originalPrice: p.compare_at_price,
-              image: p.product_images?.[0]?.url || 'https://via.placeholder.com/800x800?text=No+Image',
+              image: imgs[0]?.url || 'https://via.placeholder.com/800x800?text=No+Image',
               rating: p.rating_avg || 0,
               reviewCount: 0, // Need to implement reviews relation
               badge: p.compare_at_price > p.price ? 'Sale' : undefined, // Simple badge logic
@@ -185,8 +191,9 @@ function ShopContent() {
           setProducts(formattedProducts);
           setTotalProducts(count || 0);
         }
-      } catch (err) {
-        console.error('Error fetching products:', err);
+      } catch (err: unknown) {
+        const e = err as { message?: string; code?: string; details?: string };
+        console.error('Error fetching products:', e?.message || err, e?.code || '', e?.details || '');
       } finally {
         setLoading(false);
       }
@@ -202,7 +209,7 @@ function ShopContent() {
       <PageHero
         title="Shop All Products"
         subtitle="Browse our range of perfumes and fragrances"
-        backgroundImage="/Whisk_6ec7df94ec3ca85b49644810b7fab2ecdr.jpeg"
+        backgroundImage="/zenvira-page-hero-2.png"
       />
 
       {/* Mobile Filter Toggle */}

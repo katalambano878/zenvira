@@ -2,12 +2,10 @@
 
 import Link from 'next/link';
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { useRecaptcha } from '@/hooks/useRecaptcha';
 
 export default function LoginPage() {
-  const router = useRouter();
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -43,9 +41,12 @@ export default function LoginPage() {
     }
 
     // reCAPTCHA verification
-    const isHuman = await getToken('login');
-    if (!isHuman) {
-      setAuthError('Security verification failed. Please try again.');
+    const recaptcha = await getToken('login');
+    if (!recaptcha.ok) {
+      setAuthError(
+        recaptcha.error ||
+          'Security check failed. Try again or contact support if this keeps happening.'
+      );
       setIsLoading(false);
       return;
     }
@@ -57,13 +58,24 @@ export default function LoginPage() {
       });
 
       if (error) {
-        throw error;
+        const friendlyMessages: Record<string, string> = {
+          'Invalid login credentials': 'Wrong email or password. Please double-check and try again.',
+          'Email not confirmed': 'Your email has not been confirmed yet. Check your inbox for a confirmation link.',
+          'User not found': 'No account found with this email. Did you mean to sign up?',
+        };
+        setAuthError(friendlyMessages[error.message] || error.message);
+        setIsLoading(false);
+        return;
       }
 
       if (data.session) {
-        router.push('/account');
-        router.refresh(); // Refresh to update auth state in other components
+        window.location.assign('/account');
+        return;
       }
+
+      setAuthError(
+        'Sign-in did not return a session. Your email may need confirmation — check your inbox.'
+      );
     } catch (error: any) {
       console.error('Login error:', error);
       setAuthError(error.message || 'Failed to sign in. Please check your credentials.');
@@ -86,6 +98,7 @@ export default function LoginPage() {
               {authError}
             </div>
           )}
+
 
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>

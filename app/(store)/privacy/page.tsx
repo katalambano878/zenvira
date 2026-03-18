@@ -1,17 +1,26 @@
+import PageHero from '@/components/PageHero';
+import {
+  getSiteName,
+  getContactEmail,
+  getContactAddress,
+  getContactPhoneDisplay,
+  getContactPhoneTel,
+} from '@/lib/site-defaults';
+
 export default function PrivacyPage() {
+  const siteName = getSiteName();
+  const contactEmail = getContactEmail();
+  const contactAddress = getContactAddress() || '[Your business address]';
+  const phoneDisplay = getContactPhoneDisplay();
+  const phoneTel = getContactPhoneTel();
+
   return (
     <div className="min-h-screen bg-white">
-      <div className="bg-gradient-to-br from-blue-50 via-white to-amber-50 py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="max-w-3xl mx-auto text-center">
-            <h1 className="text-5xl font-bold text-gray-900 mb-6">Privacy Policy</h1>
-            <p className="text-xl text-gray-600 leading-relaxed">
-              Your privacy matters to us. Learn how we collect, use, and protect your personal information.
-            </p>
-            <p className="text-sm text-gray-500 mt-4">Last updated: February 2026</p>
-          </div>
-        </div>
-      </div>
+      <PageHero
+        title="Privacy Policy"
+        subtitle="Your privacy matters to us. Learn how we collect, use, and protect your personal information. Last updated: February 2026"
+        backgroundImage="/zenvira-page-hero-4.png"
+      />
 
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <div className="prose prose-lg max-w-none">
@@ -281,7 +290,7 @@ export default function PrivacyPage() {
             </div>
 
             <p className="text-gray-600 leading-relaxed">
-              To exercise any of these rights, please contact us at <a href="mailto:tiwaperfumestyle@gmail.com" className="text-blue-700 font-medium hover:underline">tiwaperfumestyle@gmail.com</a> or through your account settings. We will respond within 30 days.
+              To exercise any of these rights, please contact us at <a href={`mailto:${contactEmail}`} className="text-blue-700 font-medium hover:underline">{contactEmail}</a> or through your account settings. We will respond within 30 days.
             </p>
           </section>
 
@@ -384,7 +393,7 @@ export default function PrivacyPage() {
                   <i className="ri-mail-line text-blue-700 text-xl mt-1"></i>
                   <div>
                     <p className="font-medium text-gray-900">Email</p>
-                    <a href="mailto:tiwaperfumestyle@gmail.com" className="text-blue-700 hover:underline">tiwaperfumestyle@gmail.com</a>
+                    <a href={`mailto:${contactEmail}`} className="text-blue-700 hover:underline">{contactEmail}</a>
                   </div>
                 </div>
 
@@ -392,7 +401,11 @@ export default function PrivacyPage() {
                   <i className="ri-phone-line text-blue-700 text-xl mt-1"></i>
                   <div>
                     <p className="font-medium text-gray-900">Phone</p>
-                    <a href="tel:+233545010949" className="text-blue-700 hover:underline">054 501 0949</a> · WhatsApp <a href="https://wa.me/233554169992" className="text-blue-700 hover:underline">055 416 9992</a>
+                    {phoneTel ? (
+                      <a href={`tel:${phoneTel}`} className="text-blue-700 hover:underline">{phoneDisplay || phoneTel}</a>
+                    ) : (
+                      <span className="text-gray-600">Configure NEXT_PUBLIC_CONTACT_PHONE.</span>
+                    )}
                   </div>
                 </div>
 
@@ -400,7 +413,7 @@ export default function PrivacyPage() {
                   <i className="ri-map-pin-line text-blue-700 text-xl mt-1"></i>
                   <div>
                     <p className="font-medium text-gray-900">Address</p>
-                    <p className="text-gray-600">TIWAA PERFUME STYLE HOUSE<br />Satellite, Accra</p>
+                    <p className="text-gray-600">{siteName}<br />{contactAddress}</p>
                   </div>
                 </div>
               </div>

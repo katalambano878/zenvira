@@ -11,32 +11,36 @@ import { executeRecaptcha } from '@/lib/recaptcha';
  *   const { getToken, verifying } = useRecaptcha();
  *   
  *   async function handleSubmit() {
- *     const isHuman = await getToken('signup');
- *     if (!isHuman) return; // Failed verification
+ *     const r = await getToken('signup');
+ *     if (!r.ok) return; // r.error has details
  *     // Proceed with form submission...
  *   }
  */
+export type RecaptchaCheckResult =
+    | { ok: true }
+    | { ok: false; error: string };
+
 export function useRecaptcha() {
     const [verifying, setVerifying] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
-    const getToken = useCallback(async (action: string): Promise<boolean> => {
+    const getToken = useCallback(async (action: string): Promise<RecaptchaCheckResult> => {
         setError(null);
 
         // If reCAPTCHA is not configured, allow through (dev mode)
         if (!process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY) {
-            return true;
+            return { ok: true };
         }
 
         setVerifying(true);
         try {
             const token = await executeRecaptcha(action);
             if (!token) {
-                setError('Could not get reCAPTCHA token. Please try again.');
-                return false;
+                const msg = 'Could not get reCAPTCHA token. Please try again.';
+                setError(msg);
+                return { ok: false, error: msg };
             }
 
-            // Verify on server side
             const response = await fetch('/api/recaptcha/verify', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -45,15 +49,19 @@ export function useRecaptcha() {
 
             const result = await response.json();
             if (!result.success) {
-                setError(result.error || 'Verification failed. Please try again.');
-                return false;
+                const msg =
+                    result.error ||
+                    'Verification failed. Please try again.';
+                setError(msg);
+                return { ok: false, error: msg };
             }
 
-            return true;
+            return { ok: true };
         } catch (err: any) {
             console.error('[reCAPTCHA] Hook error:', err);
-            setError('Verification error. Please try again.');
-            return false;
+            const msg = 'Verification error. Please try again.';
+            setError(msg);
+            return { ok: false, error: msg };
         } finally {
             setVerifying(false);
         }

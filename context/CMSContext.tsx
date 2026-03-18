@@ -67,13 +67,13 @@ interface CMSContextType {
 }
 
 const defaultSettings: SiteSettings = {
-    site_name: 'TIWAA PERFUME STYLE HOUSE',
-    site_tagline: 'I sell perfumes — Wholesale and retail.',
-    site_logo: '/tiwa logo.png',
-    contact_email: 'tiwaperfumestyle@gmail.com',
-    contact_phone: '0545010949',
-    contact_whatsapp: '0554169992',
-    contact_address: 'Satellite, Accra',
+    site_name: process.env.NEXT_PUBLIC_SITE_NAME || 'Your Store',
+    site_tagline: process.env.NEXT_PUBLIC_SITE_TAGLINE || 'Online store — retail & wholesale.',
+    site_logo: '/neww.png',
+    contact_email: process.env.NEXT_PUBLIC_CONTACT_EMAIL || 'contact@example.com',
+    contact_phone: process.env.NEXT_PUBLIC_CONTACT_PHONE || '',
+    contact_whatsapp: process.env.NEXT_PUBLIC_CONTACT_WHATSAPP || process.env.NEXT_PUBLIC_CONTACT_PHONE || '',
+    contact_address: process.env.NEXT_PUBLIC_CONTACT_ADDRESS || '',
     social_facebook: '',
     social_instagram: '',
     social_twitter: '',
@@ -99,13 +99,13 @@ const CMSContext = createContext<CMSContextType>({
 
 export function CMSProvider({ children }: { children: ReactNode }) {
     const [settings, setSettings] = useState<SiteSettings>({
-        site_name: 'TIWAA PERFUME STYLE HOUSE',
-        site_tagline: 'I sell perfumes — Wholesale and retail.',
-        site_logo: '/tiwa logo.png',
-        contact_email: 'tiwaperfumestyle@gmail.com',
-        contact_phone: '0545010949',
-        contact_whatsapp: '0554169992',
-        contact_address: 'Satellite, Accra',
+        site_name: process.env.NEXT_PUBLIC_SITE_NAME || 'Your Store',
+        site_tagline: process.env.NEXT_PUBLIC_SITE_TAGLINE || 'Online store — retail & wholesale.',
+        site_logo: '/neww.png',
+        contact_email: process.env.NEXT_PUBLIC_CONTACT_EMAIL || 'contact@example.com',
+        contact_phone: process.env.NEXT_PUBLIC_CONTACT_PHONE || '',
+        contact_whatsapp: process.env.NEXT_PUBLIC_CONTACT_WHATSAPP || process.env.NEXT_PUBLIC_CONTACT_PHONE || '',
+        contact_address: process.env.NEXT_PUBLIC_CONTACT_ADDRESS || '',
         social_facebook: '',
         social_instagram: '',
         social_twitter: '',

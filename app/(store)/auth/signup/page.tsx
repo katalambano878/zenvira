@@ -91,7 +91,7 @@ export default function SignupPage() {
     }
 
     // reCAPTCHA verification
-    const isHuman = await getToken('signup');
+    const isHuman = (await getToken('signup')).ok;
     if (!isHuman) {
       setAuthError('Security verification failed. Please try again.');
       setIsLoading(false);

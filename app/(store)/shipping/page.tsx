@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import PageHero from '@/components/PageHero';
 
 export default function ShippingPage() {
   const deliveryOptions = [
@@ -20,7 +21,7 @@ export default function ShippingPage() {
       type: 'Store Pickup',
       time: 'Same Day',
       cost: 'FREE',
-      description: 'Collect from our Accra location',
+      description: 'Collect from our pickup location',
       icon: 'ri-store-2-line'
     }
   ];
@@ -34,7 +35,7 @@ export default function ShippingPage() {
     },
     {
       zone: 'Zone 2 - Greater Accra',
-      areas: 'Madina, Legon, Haatso, Achimota, Dansoman, Spintex, Teshie, Kasoa',
+      areas: 'Major metro zones — configure delivery areas in your operations docs',
       standard: '2-3 days',
       express: 'Next day'
     },
@@ -54,16 +55,11 @@ export default function ShippingPage() {
 
   return (
     <div className="min-h-screen bg-white">
-      <div className="bg-gradient-to-br from-blue-50 via-white to-amber-50 py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="max-w-3xl mx-auto text-center">
-            <h1 className="text-5xl font-bold text-gray-900 mb-6">Shipping & Delivery</h1>
-            <p className="text-xl text-gray-600 leading-relaxed">
-              Fast, reliable delivery across Ghana. Free standard shipping on orders over GHS 300.
-            </p>
-          </div>
-        </div>
-      </div>
+      <PageHero
+        title="Shipping & Delivery"
+        subtitle="Fast, reliable delivery across Ghana. Free standard shipping on orders over GHS 300."
+        backgroundImage="/zenvira-page-hero-2.png"
+      />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <div className="mb-16">

@@ -53,16 +53,14 @@ export default function PWAPrompt() {
           <div className="px-6 pb-8">
             {/* App icon and info */}
             <div className="flex items-center gap-4 mb-6">
-              <div className="w-16 h-16 rounded-2xl overflow-hidden shadow-lg flex-shrink-0 bg-blue-50 flex items-center justify-center">
-                <img
-                  src="/tiwa logo.png"
-                  alt="TIWAA PERFUME STYLE HOUSE"
-                  className="w-14 h-14 object-contain"
-                />
+              <div className="w-16 h-16 rounded-2xl shadow-lg flex-shrink-0 bg-blue-700 flex items-center justify-center">
+                <span className="font-['Pacifico'] text-2xl text-white leading-none">
+                  {process.env.NEXT_PUBLIC_WORDMARK || 'Zenvira'}
+                </span>
               </div>
               <div className="flex-1 min-w-0">
-                <h3 className="font-bold text-gray-900 text-lg truncate">TIWAA PERFUME STYLE HOUSE</h3>
-                <p className="text-sm text-gray-500">tiwaperfumestyle.com</p>
+                <h3 className="font-bold text-gray-900 text-lg truncate">{process.env.NEXT_PUBLIC_WORDMARK || 'Zenvira'}</h3>
+                <p className="text-sm text-gray-500">{process.env.NEXT_PUBLIC_SITE_TAGLINE || 'Add to home screen'}</p>
                 <div className="flex items-center gap-1 mt-1">
                   {[1, 2, 3, 4, 5].map((star) => (
                     <i key={star} className="ri-star-fill text-amber-400 text-xs" />

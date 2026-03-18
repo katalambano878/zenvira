@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 import Link from 'next/link';
+import { sanitizeAddressDisplay } from '@/lib/site-defaults';
 
 interface Banner {
     id: string;
@@ -75,7 +76,10 @@ export default function AnnouncementBar() {
         // Show default banner if no custom banners
         return (
             <div className="bg-blue-800 text-white py-2 text-center text-sm">
-                <p>Free Store Pickup Available | Order Online, Pick Up Today</p>
+                <p>
+              {process.env.NEXT_PUBLIC_SITE_TAGLINE || 'Online store'} ·{' '}
+              {sanitizeAddressDisplay(process.env.NEXT_PUBLIC_CONTACT_ADDRESS) || 'Shop with us'}
+            </p>
             </div>
         );
     }

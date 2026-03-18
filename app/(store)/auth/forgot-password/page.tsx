@@ -28,7 +28,7 @@ export default function ForgotPasswordPage() {
     }
 
     // reCAPTCHA verification
-    const isHuman = await getToken('forgot_password');
+    const isHuman = (await getToken('forgot_password')).ok;
     if (!isHuman) {
       setError('Security verification failed. Please try again.');
       setIsLoading(false);

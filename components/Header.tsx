@@ -6,6 +6,7 @@ import MiniCart from './MiniCart';
 import { useCart } from '@/context/CartContext';
 import { supabase } from '@/lib/supabase';
 import { useCMS } from '@/context/CMSContext';
+import { getWordmark } from '@/lib/site-defaults';
 import AnnouncementBar from './AnnouncementBar';
 
 export default function Header() {
@@ -18,8 +19,8 @@ export default function Header() {
   const { cartCount, isCartOpen, setIsCartOpen } = useCart();
   const { getSetting } = useCMS();
 
-  const siteName = getSetting('site_name') || 'TIWAA PERFUME STYLE HOUSE';
-  const headerLogo = getSetting('site_logo') || '/tiwa logo.png';
+  const siteName = getSetting('site_name') || (process.env.NEXT_PUBLIC_SITE_NAME || 'Your Store');
+  const wordmark = getWordmark();
 
   useEffect(() => {
     // Wishlist logic
@@ -77,10 +78,12 @@ export default function Header() {
                 </button>
                 <Link
                   href="/"
-                  className="flex items-center select-none"
-                  aria-label="Go to homepage"
+                  className="flex items-center select-none min-w-0"
+                  aria-label={`${wordmark} — home`}
                 >
-                  <img src={headerLogo} alt={siteName} className="h-9 md:h-11 w-auto object-contain" />
+                  <span className="font-['Pacifico'] text-2xl sm:text-3xl text-blue-700 md:text-blue-800 leading-none tracking-tight">
+                    {wordmark}
+                  </span>
                 </Link>
               </div>
 
@@ -213,8 +216,8 @@ export default function Header() {
           />
           <div className="absolute top-0 left-0 bottom-0 w-4/5 max-w-xs bg-white shadow-xl flex flex-col animate-in slide-in-from-left duration-300">
             <div className="p-4 border-b border-gray-100 flex items-center justify-between">
-              <Link href="/" onClick={() => setIsMobileMenuOpen(false)}>
-                <img src={headerLogo} alt={siteName} className="h-8 w-auto object-contain" />
+              <Link href="/" onClick={() => setIsMobileMenuOpen(false)} className="font-['Pacifico'] text-2xl text-blue-700">
+                {wordmark}
               </Link>
               <button
                 onClick={() => setIsMobileMenuOpen(false)}

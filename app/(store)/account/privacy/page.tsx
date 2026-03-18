@@ -21,8 +21,8 @@ export default function PrivacySettingsPage() {
           createdAt: '2024-01-15'
         },
         orders: [
-          { id: 'ORD-2024-001', date: '2024-03-15', total: 129.99 },
-          { id: 'ORD-2024-002', date: '2024-03-20', total: 89.99 }
+          { id: 'ORD-EXAMPLE-001', date: '2024-03-15', total: 129.99 },
+          { id: 'ORD-EXAMPLE-002', date: '2024-03-20', total: 89.99 }
         ],
         addresses: [
           { type: 'Home', street: '123 Main St', city: 'New York', zip: '10001' }

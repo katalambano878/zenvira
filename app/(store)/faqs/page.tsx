@@ -2,10 +2,12 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import PageHero from '@/components/PageHero';
 
 export default function FAQsPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [activeCategory, setActiveCategory] = useState('all');
+  const waDigits = (process.env.NEXT_PUBLIC_CONTACT_WHATSAPP || process.env.NEXT_PUBLIC_CONTACT_PHONE || '').replace(/\D/g, '');
 
   const categories = [
     { id: 'all', name: 'All Questions', icon: 'ri-question-line' },
@@ -25,7 +27,7 @@ export default function FAQsPage() {
     {
       category: 'orders',
       question: 'Can I modify or cancel my order?',
-      answer: 'You can modify or cancel your order within 1 hour of placing it. Contact our customer service immediately via WhatsApp 055 416 9992 or Call 054 501 0949 or email tiwaperfumestyle@gmail.com. Once an order is processed, modifications may not be possible.'
+      answer: 'You can modify or cancel your order within 1 hour of placing it. Contact us immediately via the channels on our Contact page. Once an order is processed, modifications may not be possible.'
     },
     {
       category: 'orders',
@@ -139,31 +141,26 @@ export default function FAQsPage() {
 
   return (
     <div className="min-h-screen bg-white">
-      <div className="bg-gradient-to-br from-blue-50 via-white to-amber-50 py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="max-w-3xl mx-auto text-center">
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 mb-6">
-              Frequently Asked Questions
-            </h1>
-            <p className="text-xl text-gray-600 mb-8 leading-relaxed">
-              Find quick answers to common questions about ordering, shipping, returns, payments, and more.
-            </p>
+      <PageHero
+        title="Frequently Asked Questions"
+        subtitle="Find quick answers to common questions about ordering, shipping, returns, payments, and more."
+        backgroundImage="/zenvira-page-hero-1.png"
+      />
 
-            <div className="relative">
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search for answers..."
-                className="w-full pl-12 pr-4 py-4 border border-gray-300 rounded-full focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm shadow-lg"
-              />
-              <i className="ri-search-line absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 text-xl"></i>
-            </div>
-          </div>
+      <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 -mt-16 relative z-20 pb-8">
+        <div className="relative bg-white rounded-full shadow-xl border border-gray-100 p-1">
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Search for answers..."
+            className="w-full pl-12 pr-4 py-4 border-0 rounded-full focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm bg-transparent"
+          />
+          <i className="ri-search-line absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 text-xl" />
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex flex-wrap gap-3 justify-center mb-12">
           {categories.map((category) => (
             <button
@@ -228,15 +225,17 @@ export default function FAQsPage() {
               <i className="ri-mail-line text-lg"></i>
               Contact Support
             </Link>
-            <a
-              href="https://wa.me/233554169992"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 bg-blue-600 text-white px-8 py-4 rounded-full font-medium hover:bg-blue-500 transition-colors whitespace-nowrap"
-            >
-              <i className="ri-whatsapp-line text-lg"></i>
-              Chat on WhatsApp
-            </a>
+            {waDigits ? (
+              <a
+                href={`https://wa.me/${waDigits.startsWith('0') ? `233${waDigits.slice(1)}` : waDigits}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 bg-blue-600 text-white px-8 py-4 rounded-full font-medium hover:bg-blue-500 transition-colors whitespace-nowrap"
+              >
+                <i className="ri-whatsapp-line text-lg"></i>
+                Chat on WhatsApp
+              </a>
+            ) : null}
           </div>
         </div>
       </div>

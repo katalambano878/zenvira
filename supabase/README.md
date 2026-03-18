@@ -2,6 +2,16 @@
 
 This folder contains all SQL migration files for your e-commerce store database.
 
+## Running migrations (`npm run db:migrate`)
+
+1. Add **`DATABASE_URL`** (or **`SUPABASE_DB_PASSWORD`** + **`NEXT_PUBLIC_SUPABASE_URL`**) to `.env.local`. Use **Session pooler** or **direct** connection from Supabase → Project Settings → Database.
+2. Run **`npm run db:migrate`**.
+
+**Why it used to “stop halfway”:** Postgres runs a whole `.sql` file as one batch. The first error (e.g. `type "user_role" already exists`) aborts the **entire** rest of the file—so tables like **`profiles`** are never created. The migration script now runs the big schema **statement-by-statement** and skips harmless “already exists” DDL so the rest can finish.
+
+- **`MIGRATE_STRICT=1`** — old behavior: one query per file (fails on any duplicate).
+- **`SKIP_COMPLETE_SCHEMA=1`** — only run the smaller migrations after the main schema file.
+
 ## 📁 Migration Files
 
 ### 001_initial_schema.sql

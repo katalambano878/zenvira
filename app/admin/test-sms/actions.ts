@@ -1,6 +1,7 @@
 'use server';
 
 import { verifyAdminToken } from '@/lib/auth';
+import { getSmsSenderId } from '@/lib/site-defaults';
 
 export async function testSmsAction(phone: string, message: string, authToken: string) {
     // SECURITY: Verify admin authentication before allowing SMS sending
@@ -54,7 +55,7 @@ export async function testSmsAction(phone: string, message: string, authToken: s
             },
             body: JSON.stringify({
                 type: 1,
-                senderid: 'TIWAA',
+                senderid: getSmsSenderId(),
                 messages: [
                     {
                         recipient: recipient,

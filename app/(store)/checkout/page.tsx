@@ -130,7 +130,7 @@ export default function CheckoutPage() {
     setIsLoading(true);
 
     // reCAPTCHA verification
-    const isHuman = await getToken('checkout');
+    const isHuman = (await getToken('checkout')).ok;
     if (!isHuman) {
       alert('Security verification failed. Please try again.');
       setIsLoading(false);

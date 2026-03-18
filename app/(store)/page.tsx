@@ -10,9 +10,15 @@ import AnimatedSection, { AnimatedGrid } from '@/components/AnimatedSection';
 import NewsletterSection from '@/components/NewsletterSection';
 import { usePageTitle } from '@/hooks/usePageTitle';
 
+const HOME_CATEGORY_TINTS = ['bg-blue-900', 'bg-rose-900', 'bg-amber-900', 'bg-stone-900', 'bg-emerald-900', 'bg-violet-900', 'bg-orange-900', 'bg-slate-900'];
+
 export default function Home() {
   usePageTitle('');
   const [featuredProducts, setFeaturedProducts] = useState<any[]>([]);
+  /** Top-level categories for homepage grid — from Supabase (Admin: Featured + image) */
+  const [homeCategories, setHomeCategories] = useState<
+    { id: string; name: string; display_name: string; slug: string; subtitle: string; image: string; tint: string }[]
+  >([]);
 
   const [loading, setLoading] = useState(true);
 
@@ -39,8 +45,8 @@ export default function Home() {
     banners?: Array<{ text: string; active: boolean }>;
   } = {
     hero: {
-      headline: 'TIWAA PERFUME STYLE HOUSE — Perfumes Wholesale & Retail',
-      subheadline: 'Curated fragrances at competitive prices. Satellite, Accra. For resellers and individual customers across Ghana.',
+      headline: `${process.env.NEXT_PUBLIC_SITE_NAME || 'Your Store'} — ${process.env.NEXT_PUBLIC_SITE_TAGLINE || 'Shop online'}`,
+      subheadline: 'Quality products. Retail & wholesale. Fast delivery where we serve — update this copy for your brand.',
       primaryButtonText: 'Shop Collections',
       primaryButtonLink: '/shop',
       secondaryButtonText: 'Our Story',
@@ -48,7 +54,7 @@ export default function Home() {
       // backgroundImage: 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?q=80&w=2070&auto=format&fit=crop' // Optional override
     },
     banners: [
-      { text: '🚚 Free delivery on orders over GH₵ 500 within Accra!', active: false },
+      { text: '🚚 Fast local delivery where available. Nationwide shipping.', active: false },
       { text: '✨ New stock arriving this weekend - Pre-order now!', active: false },
       { text: '💳 Secure payments via Mobile Money & Card', active: false }
     ]
@@ -57,7 +63,6 @@ export default function Home() {
   useEffect(() => {
     async function fetchData() {
       try {
-        // Fetch featured products directly from Supabase
         const { data: productsData, error: productsError } = await supabase
           .from('products')
           .select('*, product_variants(*), product_images(*)')
@@ -69,6 +74,36 @@ export default function Home() {
         if (productsError) throw productsError;
         setFeaturedProducts(productsData || []);
 
+        const { data: catRows, error: catErr } = await supabase
+          .from('categories')
+          .select('id, name, slug, description, image_url, parent_id, position, metadata')
+          .eq('status', 'active')
+          .is('parent_id', null)
+          .order('position', { ascending: true });
+
+        if (!catErr && catRows?.length) {
+          const featured = catRows.filter(
+            (c) => c.metadata?.featured === true && c.image_url
+          );
+          const withImage = catRows.filter((c) => c.image_url);
+          const source = featured.length > 0 ? featured : withImage;
+          setHomeCategories(
+            source.slice(0, 8).map((c, i) => ({
+              id: c.id,
+              name: c.name,
+              display_name: (c.metadata as { display_name?: string })?.display_name || c.name,
+              slug: c.slug,
+              subtitle:
+                (c.description || '').trim().slice(0, 120) ||
+                (c.metadata as { subtitle?: string })?.subtitle ||
+                'Shop this collection',
+              image: c.image_url as string,
+              tint: HOME_CATEGORY_TINTS[i % HOME_CATEGORY_TINTS.length],
+            }))
+          );
+        } else {
+          setHomeCategories([]);
+        }
       } catch (error: unknown) {
         const err = error as { message?: string; code?: string };
         const msg = err?.message ?? (error instanceof Error ? error.message : String(error));
@@ -89,7 +124,7 @@ export default function Home() {
 
   const getHeroImage = () => {
     if (config.hero.backgroundImage) return config.hero.backgroundImage;
-    return "/tiwa logo.png";
+    return "/neww.png";
   };
 
   const renderBanners = () => {
@@ -128,30 +163,30 @@ export default function Home() {
         {/* Background Slider + Per-Slide Content */}
         {[
           {
-            image: '/Whisk_4e28dc6bf0d6be98458435c0c2950e3ddr.jpeg',
-            tag: 'New Arrivals',
-            heading: <>Premium <br /><span className="italic font-light text-blue-200">Quality Collection</span></>,
-            subtext: 'Discover our latest arrivals imported directly for you. Unmatched quality at unbeatable prices.',
-            cta: { text: 'Shop Now', href: '/shop' },
-            cta2: { text: 'View Catalog', href: '/categories' },
+            image: '/zenvira-slider-cucumber.png',
+            tag: 'Daily essential',
+            heading: <>Cucumber <br /><span className="italic font-light text-emerald-100">100% organic</span></>,
+            subtext: 'Fresh, spa-inspired care for face & body — calm mornings and wind-down nights.',
+            cta: { text: 'Shop now', href: '/shop' },
+            cta2: { text: 'Our story', href: '/about' },
             position: 'object-center'
           },
           {
-            image: '/Whisk_50c2f050b440b4b95064c372c1ec7ee1dr.jpeg',
-            tag: 'Fashion & Style',
-            heading: <>Elegance <br /><span className="italic font-light text-rose-200">Redefined</span></>,
-            subtext: 'Step into the season with our exclusive fashion edits. Curated for the modern trendsetter.',
-            cta: { text: 'Shop Fashion', href: '/shop?category=fashion' },
-            cta2: { text: 'Learn More', href: '/about' },
-            position: 'object-top'
+            image: '/zenvira-slider-coconut.png',
+            tag: 'Zenvira',
+            heading: <>Coconut oil <br /><span className="italic font-light text-amber-100">Daily essential</span></>,
+            subtext: '100% organic — beach-fresh purity for skin and hair, straight from the tropics.',
+            cta: { text: 'Browse shop', href: '/shop' },
+            cta2: { text: 'Categories', href: '/categories' },
+            position: 'object-center'
           },
           {
-            image: '/Whisk_64e2698834d1476801a4b505b30c324bdr.jpeg',
-            tag: 'Exclusive Deals',
-            heading: <>Limited <br /><span className="italic font-light text-amber-200">Time Offers</span></>,
-            subtext: 'Don\'t miss out on our seasonal sale. Great discounts on your favorite items.',
-            cta: { text: 'View Offers', href: '/shop?on_sale=true' },
-            cta2: { text: 'Contact Us', href: '/contact' },
+            image: '/zenvira-hero-3.png',
+            tag: 'Spa at home',
+            heading: <>Luxury <br /><span className="italic font-light text-amber-100">Self-care</span></>,
+            subtext: 'Warm light, natural notes, and oils made for unwinding — your quiet moment, amplified.',
+            cta: { text: 'Shop collection', href: '/shop' },
+            cta2: { text: 'Contact', href: '/contact' },
             position: 'object-center'
           },
         ].map((slide, index) => (
@@ -241,9 +276,8 @@ export default function Home() {
 
       </section>
 
-      {/* Categories Section - God Level Redesign */}
+      {homeCategories.length > 0 && (
       <section className="py-20 md:py-32 bg-white relative overflow-hidden">
-        {/* Decorative Background Element */}
         <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-gray-200 to-transparent"></div>
 
         <div className="max-w-[1400px] mx-auto px-4 sm:px-6">
@@ -265,45 +299,10 @@ export default function Home() {
           </AnimatedSection>
 
           <AnimatedGrid className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
-            {[
-              {
-                id: 'fresh',
-                name: 'Fresh',
-                subtitle: 'Cool, Clean, Airy',
-                slug: 'fresh',
-                image: '/Whisk_4e28dc6bf0d6be98458435c0c2950e3ddr.jpeg',
-                tint: 'bg-blue-900'
-              },
-              {
-                id: 'floral',
-                name: 'Floral',
-                subtitle: 'Romantic, Soft, Elegant',
-                slug: 'floral',
-                image: '/Whisk_50c2f050b440b4b95064c372c1ec7ee1dr.jpeg',
-                tint: 'bg-rose-900'
-              },
-              {
-                id: 'oriental',
-                name: 'Oriental',
-                display_name: 'Oriental (Amber)',
-                subtitle: 'Warm, Opulent, Spicy',
-                slug: 'oriental-amber',
-                image: '/Whisk_64e2698834d1476801a4b505b30c324bdr.jpeg',
-                tint: 'bg-amber-900'
-              },
-              {
-                id: 'woody',
-                name: 'Woody',
-                subtitle: 'Earthy, Refined, Natural',
-                slug: 'woody',
-                image: '/Whisk_6ec7df94ec3ca85b49644810b7fab2ecdr.jpeg',
-                tint: 'bg-stone-900'
-              }
-            ].map((category) => (
-              <Link href={`/shop?category=${category.slug}`} key={category.id} className="group block h-full w-full">
+              {homeCategories.map((category) => (
+              <Link href={`/shop?category=${encodeURIComponent(category.slug)}`} key={category.id} className="group block h-full w-full">
                 <div className="relative aspect-[3/4] overflow-hidden isolate bg-gray-900 shadow-2xl rounded-3xl">
 
-                  {/* Image: Cinematic Slow Zoom & Brightness Shift */}
                   <div className="absolute inset-0 transition-transform duration-[1500ms] ease-out group-hover:scale-110 opacity-90 group-hover:opacity-100">
                     <Image
                       src={category.image}
@@ -311,6 +310,7 @@ export default function Home() {
                       fill
                       className="object-cover"
                       sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
+                      unoptimized={category.image.startsWith('http')}
                     />
                   </div>
 
@@ -367,7 +367,7 @@ export default function Home() {
           </AnimatedGrid>
         </div>
       </section>
-
+      )}
 
       {/* Featured Products */}
       <section className="py-16 md:py-24 bg-stone-50">

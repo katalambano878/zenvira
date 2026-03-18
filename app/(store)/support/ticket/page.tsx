@@ -38,7 +38,7 @@ export default function SupportTicketPage() {
     setIsSubmitting(true);
 
     // reCAPTCHA verification
-    const isHuman = await getToken('support_ticket');
+    const isHuman = (await getToken('support_ticket')).ok;
     if (!isHuman) {
       setIsSubmitting(false);
       alert('Security verification failed. Please try again.');
@@ -166,7 +166,7 @@ export default function SupportTicketPage() {
                   value={formData.orderNumber}
                   onChange={(e) => setFormData({ ...formData, orderNumber: e.target.value })}
                   className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  placeholder="ORD-2024-001"
+                  placeholder="ORD-XXXX-XXX"
                 />
               </div>
 

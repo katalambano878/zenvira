@@ -27,14 +27,12 @@ export default function PWASplash() {
 
   return (
     <div className="pwa-splash" aria-hidden="true">
-      <div className="pwa-splash-logo mb-6">
-        <img
-          src="/tiwa logo.png"
-          alt="TIWAA PERFUME STYLE HOUSE"
-          className="w-24 h-24 object-contain brightness-0 invert"
-        />
+      <div className="pwa-splash-logo mb-4">
+        <span className="font-['Pacifico'] text-5xl text-white drop-shadow-lg" aria-hidden>
+          {process.env.NEXT_PUBLIC_WORDMARK || 'Zenvira'}
+        </span>
       </div>
-      <h1 className="text-white text-xl font-bold font-serif mb-2">TIWAA PERFUME STYLE HOUSE</h1>
+      <h1 className="text-white text-lg font-medium font-sans mb-2 opacity-90">{process.env.NEXT_PUBLIC_SITE_NAME || 'Your Store'}</h1>
       <p className="text-blue-200 text-sm font-medium mb-8">Quality Products & Supplies</p>
       <div className="pwa-splash-dots flex gap-1.5">
         <span className="w-2 h-2 bg-white rounded-full" />

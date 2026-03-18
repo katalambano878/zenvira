@@ -263,11 +263,12 @@ export default function ProductDetailClient({ slug }: { slug: string }) {
     category: product.category
   });
 
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://example.com';
   const breadcrumbSchema = generateBreadcrumbSchema([
-    { name: 'Home', url: 'https://tiwaperfumestyle.com' },
-    { name: 'Shop', url: 'https://tiwaperfumestyle.com/shop' },
-    { name: product.category, url: `https://tiwaperfumestyle.com/shop?category=${product.category.toLowerCase().replace(/\s+/g, '-')}` },
-    { name: product.name, url: `https://tiwaperfumestyle.com/product/${slug}` }
+    { name: 'Home', url: baseUrl },
+    { name: 'Shop', url: `${baseUrl}/shop` },
+    { name: product.category, url: `${baseUrl}/shop?category=${product.category.toLowerCase().replace(/\s+/g, '-')}` },
+    { name: product.name, url: `${baseUrl}/product/${slug}` }
   ]);
 
   return (

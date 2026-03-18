@@ -2,7 +2,7 @@
 
 import { useEffect } from 'react';
 
-const SITE_NAME = 'TIWAA PERFUME STYLE HOUSE';
+const SITE_NAME = process.env.NEXT_PUBLIC_SITE_NAME || 'Your Store';
 
 export function usePageTitle(title: string) {
   useEffect(() => {

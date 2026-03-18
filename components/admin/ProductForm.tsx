@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 import { useRouter } from 'next/navigation';
+import { getSkuPrefix } from '@/lib/site-defaults';
 
 interface ProductFormProps {
     initialData?: any;
@@ -31,7 +32,7 @@ export default function ProductForm({ initialData, isEditMode = false }: Product
 
     // Auto-generate SKU function
     const generateSku = () => {
-        const prefix = 'TIWAA'; // TIWAA PERFUME STYLE HOUSE
+        const prefix = getSkuPrefix();
         const timestamp = Date.now().toString(36).toUpperCase().slice(-4);
         const random = Math.random().toString(36).substring(2, 6).toUpperCase();
         return `${prefix}-${timestamp}-${random}`;

@@ -2,6 +2,15 @@ import type { Metadata, Viewport } from "next";
 import Script from "next/script";
 import { CartProvider } from "@/context/CartContext";
 import { WishlistProvider } from "@/context/WishlistContext";
+import {
+  getSiteName,
+  getSiteTagline,
+  getDefaultMetaDescription,
+  getDefaultTitleSuffix,
+  getContactEmail,
+  getContactAddress,
+  getContactPhoneTel,
+} from "@/lib/site-defaults";
 import "./globals.css";
 
 export const viewport: Viewport = {
@@ -11,30 +20,29 @@ export const viewport: Viewport = {
   themeColor: '#2563eb',
 };
 
-const siteUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://tiwaperfumestyle.com';
+const siteUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://example.com';
+const siteName = getSiteName();
+const titleSuffix = getDefaultTitleSuffix();
+const metaDesc = getDefaultMetaDescription();
 
-// Favicon & OG: uses tiwa logo.png from public
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
-    default: "TIWAA PERFUME STYLE HOUSE | Perfumes Wholesale & Retail — Satellite, Accra",
-    template: "%s | TIWAA PERFUME STYLE HOUSE"
+    default: titleSuffix,
+    template: `%s | ${siteName}`,
   },
-  description: "I sell perfumes — wholesale and retail. Satellite, Accra. Call 054 501 0949 · WhatsApp 055 416 9992.",
+  description: metaDesc,
   keywords: [
-    "TIWAA PERFUME STYLE HOUSE",
-    "perfumes Ghana",
-    "wholesale perfumes Accra",
-    "retail perfumes",
-    "Satellite Accra",
-    "fragrance Ghana",
-    "Ghana perfumes",
-    "Accra perfume shop"
+    siteName,
+    "online store",
+    "retail",
+    "wholesale",
+    "e-commerce",
   ],
-  authors: [{ name: "TIWAA PERFUME STYLE HOUSE" }],
-  creator: "TIWAA PERFUME STYLE HOUSE",
-  publisher: "TIWAA PERFUME STYLE HOUSE",
-  applicationName: "TIWAA PERFUME STYLE HOUSE",
+  authors: [{ name: siteName }],
+  creator: siteName,
+  publisher: siteName,
+  applicationName: siteName,
   referrer: "origin-when-cross-origin",
   robots: {
     index: true,
@@ -49,16 +57,16 @@ export const metadata: Metadata = {
   },
   icons: {
     icon: [
-      { url: '/tiwa logo.png', sizes: 'any', type: 'image/png' },
+      { url: '/neww.png', sizes: 'any', type: 'image/png' },
     ],
-    shortcut: '/tiwa logo.png',
-    apple: '/tiwa logo.png',
+    shortcut: '/neww.png',
+    apple: '/neww.png',
   },
   manifest: '/manifest.json',
   appleWebApp: {
     capable: true,
     statusBarStyle: 'default',
-    title: 'TIWAA PERFUME',
+    title: siteName,
   },
   formatDetection: {
     telephone: true,
@@ -70,26 +78,26 @@ export const metadata: Metadata = {
   },
   openGraph: {
     type: "website",
-    locale: "en_GH",
+    locale: "en",
     url: siteUrl,
-    title: "TIWAA PERFUME STYLE HOUSE | Perfumes Wholesale & Retail — Satellite, Accra",
-    description: "I sell perfumes — wholesale and retail. Satellite, Accra. Call 054 501 0949 · WhatsApp 055 416 9992.",
-    siteName: "TIWAA PERFUME STYLE HOUSE",
+    title: titleSuffix,
+    description: metaDesc,
+    siteName,
     images: [
       {
-        url: "/tiwa logo.png",
+        url: "/neww.png",
         width: 1200,
         height: 630,
-        alt: "TIWAA PERFUME STYLE HOUSE — Perfumes Wholesale & Retail",
+        alt: `${siteName} — ${getSiteTagline()}`,
         type: "image/png",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "TIWAA PERFUME STYLE HOUSE | Perfumes Wholesale & Retail",
-    description: "I sell perfumes — wholesale and retail. Satellite, Accra. Call 054 501 0949 · WhatsApp 055 416 9992.",
-    images: ["/tiwa logo.png"],
+    title: titleSuffix,
+    description: metaDesc,
+    images: ["/neww.png"],
   },
   alternates: {
     canonical: siteUrl,
@@ -97,10 +105,39 @@ export const metadata: Metadata = {
   category: "shopping",
 };
 
-// Google Analytics Measurement ID
 const GA_MEASUREMENT_ID = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID;
-// Google reCAPTCHA v3 Site Key
 const RECAPTCHA_SITE_KEY = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY;
+
+function buildOrganizationJsonLd(): Record<string, unknown> {
+  const org: Record<string, unknown> = {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    name: siteName,
+    url: siteUrl,
+    logo: `${siteUrl.replace(/\/$/, '')}/neww.png`,
+    description: metaDesc,
+  };
+  const addr = getContactAddress();
+  if (addr) {
+    org.address = {
+      "@type": "PostalAddress",
+      streetAddress: addr,
+      addressCountry: "GH",
+    };
+  }
+  const tel = getContactPhoneTel();
+  const email = getContactEmail();
+  const contactPoint: Record<string, unknown> = {
+    "@type": "ContactPoint",
+    contactType: "customer service",
+    email,
+    availableLanguage: "English",
+  };
+  if (tel) contactPoint.telephone = tel;
+  org.contactPoint = contactPoint;
+  if (tel) org.telephone = tel;
+  return org;
+}
 
 export default function RootLayout({
   children,
@@ -110,22 +147,19 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-        {/* PWA Meta Tags */}
         <meta name="theme-color" content="#2563eb" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-        <meta name="apple-mobile-web-app-title" content="TIWAA PERFUME" />
+        <meta name="apple-mobile-web-app-title" content={siteName} />
         <meta name="mobile-web-app-capable" content="yes" />
         <meta name="msapplication-TileColor" content="#2563eb" />
         <meta name="msapplication-tap-highlight" content="no" />
 
-        {/* Favicon from public folder */}
-        <link rel="icon" href="/tiwa logo.png" type="image/png" sizes="any" />
-        <link rel="shortcut icon" href="/tiwa logo.png" />
+        <link rel="icon" href="/neww.png" type="image/png" sizes="any" />
+        <link rel="shortcut icon" href="/neww.png" />
 
-        {/* Apple Touch Icons from public */}
-        <link rel="apple-touch-icon" href="/tiwa logo.png" />
-        <link rel="apple-touch-startup-image" href="/tiwa logo.png" />
+        <link rel="apple-touch-icon" href="/neww.png" />
+        <link rel="apple-touch-startup-image" href="/neww.png" />
 
         <link
           href="https://cdn.jsdelivr.net/npm/remixicon@4.1.0/fonts/remixicon.css"
@@ -136,36 +170,14 @@ export default function RootLayout({
         {/* eslint-disable-next-line @next/next/no-page-custom-font -- App Router: fonts loaded in root layout apply to all pages */}
         <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
 
-        {/* Structured Data - Organization */}
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
-              "@context": "https://schema.org",
-              "@type": "Organization",
-              "name": "TIWAA PERFUME STYLE HOUSE",
-              "url": siteUrl,
-              "logo": siteUrl + "/tiwa%20logo.png",
-              "description": "I sell perfumes — wholesale and retail. Satellite, Accra.",
-              "address": {
-                "@type": "PostalAddress",
-                "addressCountry": "GH",
-                "addressLocality": "Accra",
-                "streetAddress": "Satellite, Accra"
-              },
-              "telephone": "+233545010949",
-              "contactPoint": {
-                "@type": "ContactPoint",
-                "contactType": "customer service",
-                "telephone": "+233545010949",
-                "availableLanguage": "English"
-              }
-            })
+            __html: JSON.stringify(buildOrganizationJsonLd()),
           }}
         />
       </head>
 
-      {/* Google Analytics */}
       {GA_MEASUREMENT_ID && (
         <>
           <Script
@@ -185,7 +197,6 @@ export default function RootLayout({
         </>
       )}
 
-      {/* Google reCAPTCHA v3 */}
       {RECAPTCHA_SITE_KEY && (
         <Script
           src={`https://www.google.com/recaptcha/api.js?render=${RECAPTCHA_SITE_KEY}`}

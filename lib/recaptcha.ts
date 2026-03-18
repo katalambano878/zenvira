@@ -7,6 +7,12 @@ const RECAPTCHA_SECRET_KEY = process.env.RECAPTCHA_SECRET_KEY || '';
 
 // Minimum score to pass verification (0.0 = bot, 1.0 = human)
 const MIN_SCORE = 0.5;
+/** Login is stricter on bots but lenient enough that real users rarely get stuck */
+const MIN_SCORE_BY_ACTION: Record<string, number> = {
+    login: 0.3,
+    signup: 0.5,
+    default: 0.5,
+};
 
 /**
  * Client-side: Execute reCAPTCHA v3 and return a token.
@@ -78,9 +84,10 @@ export async function verifyRecaptcha(
             return { success: false, error: 'reCAPTCHA action mismatch', score: data.score };
         }
 
-        // Check score threshold
-        if (data.score < MIN_SCORE) {
-            console.warn(`[reCAPTCHA] Low score: ${data.score} for action: ${data.action}`);
+        const minScore =
+            (expectedAction && MIN_SCORE_BY_ACTION[expectedAction]) ?? MIN_SCORE_BY_ACTION.default;
+        if (data.score < minScore) {
+            console.warn(`[reCAPTCHA] Low score: ${data.score} for action: ${data.action} (min ${minScore})`);
             return { success: false, error: 'reCAPTCHA score too low', score: data.score };
         }
 

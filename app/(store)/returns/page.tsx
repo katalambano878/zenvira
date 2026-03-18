@@ -3,12 +3,10 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import Header from '@/components/Header';
-import Footer from '@/components/Footer';
 
 const mockOrders = [
   {
-    id: 'ORD-2024-156',
+    id: 'ORD-EXAMPLE-001',
     date: '2024-01-20',
     items: [
       {
@@ -78,9 +76,7 @@ export default function ReturnsPortalPage() {
   };
 
   return (
-    <>
-      <Header />
-      <main className="min-h-screen bg-gray-50 py-12">
+    <main className="min-h-screen bg-gray-50 py-12">
         <div className="max-w-4xl mx-auto px-4">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Returns Portal</h1>
           <p className="text-gray-600 mb-8">Start your return or exchange process</p>
@@ -122,7 +118,7 @@ export default function ReturnsPortalPage() {
                     value={orderNumber}
                     onChange={(e) => setOrderNumber(e.target.value)}
                     className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    placeholder="ORD-2024-156"
+                    placeholder="ORD-XXXX-XXX"
                     required
                   />
                 </div>
@@ -336,7 +332,5 @@ export default function ReturnsPortalPage() {
           )}
         </div>
       </main>
-      <Footer />
-    </>
   );
 }
