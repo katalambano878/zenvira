@@ -1,4 +1,4 @@
-/** Storefront imagery — Mamator t-shirt catalog */
+/** Storefront imagery — product catalog */
 export const TEE_IMAGES = {
   heroFlatLay: '/hero-fashion-bg.jpg',
   heroGraphic: '/hero-tee-graphic.jpg',

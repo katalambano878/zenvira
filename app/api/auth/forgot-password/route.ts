@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { SignJWT } from 'jose';
 import { queryOne } from '@/lib/db';
 import { Resend } from 'resend';
+import { getSiteName } from '@/lib/site-defaults';
 
 function getSecret() {
   const secret = process.env.AUTH_SECRET;
@@ -53,7 +54,7 @@ export async function POST(request: Request) {
       await resend.emails.send({
         from,
         to: user.email,
-        subject: 'Reset your Mamator password',
+        subject: `Reset your ${getSiteName()} password`,
         html: `<p>Reset your password by opening this link (valid 1 hour):</p><p><a href="${resetUrl}">${resetUrl}</a></p>`,
       });
     } else {

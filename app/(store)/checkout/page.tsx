@@ -160,8 +160,7 @@ export default function CheckoutPage() {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
               orderId: orderNumber,
-              amount: total,
-              customerEmail: shippingData.email
+              customerEmail: shippingData.email,
             })
           });
 

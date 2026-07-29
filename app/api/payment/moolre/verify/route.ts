@@ -1,6 +1,11 @@
 import { NextResponse } from 'next/server';
 import { query, queryOne } from '@/lib/db';
 import { sendOrderConfirmation } from '@/lib/notifications';
+import {
+  getLatestExternalRef,
+  markPaymentAttemptStatus,
+  verifyMoolreExternalRef,
+} from '@/lib/payments/moolre';
 import { checkRateLimit, getClientIdentifier, RATE_LIMITS } from '@/lib/rate-limit';
 
 type OrderRow = {
@@ -58,55 +63,54 @@ export async function POST(req: Request) {
 
     const meta = order.metadata || {};
     if (meta.payment_method && meta.payment_method !== 'moolre') {
-      return NextResponse.json({
-        success: false,
-        message: 'This order does not use Moolre payment',
-      }, { status: 400 });
+      return NextResponse.json(
+        {
+          success: false,
+          message: 'This order does not use Moolre payment',
+        },
+        { status: 400 }
+      );
     }
 
     if (!process.env.MOOLRE_API_USER || !process.env.MOOLRE_API_PUBKEY) {
-      return NextResponse.json({
-        success: false,
-        status: order.status,
-        payment_status: order.payment_status,
-        message: 'Payment verification unavailable',
-      }, { status: 503 });
+      return NextResponse.json(
+        {
+          success: false,
+          status: order.status,
+          payment_status: order.payment_status,
+          message: 'Payment verification unavailable',
+        },
+        { status: 503 }
+      );
     }
+
+    const storedRef = await getLatestExternalRef(orderNumber);
+    const refsToTry = Array.from(new Set([storedRef, orderNumber].filter(Boolean) as string[]));
 
     let moolreApiVerified = false;
+    let matchedRef: string | null = null;
+    let paidAmount: number | null = null;
 
-    try {
-      const checkResponse = await fetch('https://api.moolre.com/embed/status', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-API-USER': process.env.MOOLRE_API_USER,
-          'X-API-PUBKEY': process.env.MOOLRE_API_PUBKEY,
-        },
-        body: JSON.stringify({ externalref: orderNumber }),
-      });
+    for (const externalRef of refsToTry) {
+      try {
+        const check = await verifyMoolreExternalRef(externalRef);
+        if (!check.verified) continue;
 
-      const checkResult = await checkResponse.json();
-      const statusStr = String(checkResult.data?.status || '').toLowerCase();
-      moolreApiVerified =
-        checkResult.status === 1 &&
-        checkResult.data &&
-        (statusStr === 'success' ||
-          statusStr === 'successful' ||
-          statusStr === 'completed' ||
-          statusStr === 'paid');
-
-      if (moolreApiVerified && checkResult.data?.amount) {
-        const paidAmount = parseFloat(checkResult.data.amount);
-        if (Math.abs(paidAmount - Number(order.total)) > 0.01) {
-          moolreApiVerified = false;
+        if (check.amount !== null && Math.abs(check.amount - Number(order.total)) > 0.01) {
+          console.warn('[Verify] Amount mismatch for', orderNumber);
+          continue;
         }
+
+        moolreApiVerified = true;
+        matchedRef = externalRef;
+        paidAmount = check.amount;
+        break;
+      } catch (moolreError: unknown) {
+        console.warn('[Verify] Moolre API check failed');
       }
-    } catch (moolreError: unknown) {
-      console.warn('[Verify] Moolre API check failed:', moolreError);
     }
 
-    if (!moolreApiVerified) {
+    if (!moolreApiVerified || !matchedRef) {
       return NextResponse.json({
         success: false,
         status: order.status,
@@ -117,12 +121,21 @@ export async function POST(req: Request) {
 
     const paidRow = await queryOne<{ result: OrderJson }>(
       `SELECT mark_order_paid($1, $2) AS result`,
-      [orderNumber, 'moolre-api-verify']
+      [orderNumber, `moolre-api-verify:${matchedRef}`]
     );
     const orderJson = paidRow?.result;
 
     if (!orderJson) {
       return NextResponse.json({ success: false, message: 'Failed to update order' }, { status: 500 });
+    }
+
+    try {
+      await markPaymentAttemptStatus(matchedRef, 'successful', {
+        amountPaid: paidAmount ?? Number(order.total),
+        gatewayReference: `verify:${matchedRef}`,
+      });
+    } catch {
+      /* best-effort */
     }
 
     if (orderJson.email) {
@@ -132,14 +145,14 @@ export async function POST(req: Request) {
           Number(orderJson.total),
         ]);
       } catch (statsError: unknown) {
-        console.error('[Verify] Customer stats failed:', statsError);
+        console.error('[Verify] Customer stats failed');
       }
     }
 
     try {
       await sendOrderConfirmation(orderJson);
     } catch (notifyError: unknown) {
-      console.error('[Verify] Notification failed:', notifyError);
+      console.error('[Verify] Notification failed');
     }
 
     return NextResponse.json({
@@ -149,8 +162,7 @@ export async function POST(req: Request) {
       message: 'Payment verified and order updated',
     });
   } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : 'Internal error';
-    console.error('[Verify] Error:', message);
+    console.error('[Verify] Error');
     return NextResponse.json({ success: false, message: 'Internal error' }, { status: 500 });
   }
 }

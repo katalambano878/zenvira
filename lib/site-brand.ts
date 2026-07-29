@@ -1,29 +1,31 @@
 /** Shared brand URLs and SEO copy for metadata, JSON-LD, and PWA. */
 
-export const SITE_LEGAL_NAME = 'Mamator Trading Enterprise';
+import {
+  getAppUrl,
+  getContactAddress,
+  getContactEmail,
+  getContactPhoneDisplay,
+  getContactPhoneTel,
+  getDefaultMetaDescription,
+  getDefaultTitleSuffix,
+  getSiteName,
+} from '@/lib/site-defaults';
+
+export const SITE_LEGAL_NAME = getSiteName();
 
 export function getSiteUrl(): string {
-  return (process.env.NEXT_PUBLIC_APP_URL || 'https://mamator.com').replace(/\/+$/, '');
+  return getAppUrl();
 }
 
-export const SITE_DEFAULT_TITLE = 'Mamator | Premium T-Shirts & Tees Online in Ghana';
+export const SITE_DEFAULT_TITLE = getDefaultTitleSuffix();
 
-export const SITE_DEFAULT_DESCRIPTION =
-  'Shop graphic tees, plain basics, polos & performance shirts from Mamator Trading Enterprise. Quality apparel with delivery across Ghana — Accra, Kasoa, Koforidua & nationwide.';
+export const SITE_DEFAULT_DESCRIPTION = getDefaultMetaDescription();
 
 export const SITE_KEYWORDS = [
-  'Mamator',
-  'Mamator Trading Enterprise',
-  't-shirts Ghana',
-  'graphic tees Ghana',
-  'polo shirts Ghana',
-  'buy tees online Ghana',
-  'wholesale t-shirts Ghana',
-  'Accra online shop',
-  'Kasoa shop',
-  'Koforidua shop',
-  'Ghana e-commerce',
-  'Mamator tees',
+  getSiteName(),
+  'online store',
+  'e-commerce',
+  'shop online',
 ] as const;
 
 export const BRAND_ASSETS = {
@@ -43,7 +45,7 @@ export function absoluteAsset(path: string): string {
   return `${getSiteUrl()}${path.startsWith('/') ? path : `/${path}`}`;
 }
 
-/** Prefer bundled Mamator logo; ignore legacy CMS paths until admin uploads a new one. */
+/** Prefer bundled logo; ignore legacy CMS paths until admin uploads a new one. */
 export function resolveSiteLogo(stored?: string | null): string {
   const value = stored?.trim();
   if (!value) return BRAND_ASSETS.logo;
@@ -53,9 +55,9 @@ export function resolveSiteLogo(stored?: string | null): string {
 
 /** Default contact for structured data (overridden when site_settings are populated). */
 export const SITE_CONTACT = {
-  email: 'info@mamator.com',
-  phonePrimary: '+233249628324',
-  phoneSecondary: '+233553188619',
-  areaServed: 'GH',
-  addressLocality: 'Accra, Kasoa, Koforidua',
+  email: getContactEmail(),
+  phonePrimary: getContactPhoneTel() || getContactPhoneDisplay(),
+  phoneSecondary: '',
+  areaServed: '',
+  addressLocality: getContactAddress(),
 } as const;

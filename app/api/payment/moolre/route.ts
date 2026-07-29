@@ -1,6 +1,9 @@
 import { NextResponse } from 'next/server';
 import { queryOne } from '@/lib/db';
+import { fetchWithTimeout } from '@/lib/http/fetch-timeout';
+import { recordPaymentAttempt } from '@/lib/payments/moolre';
 import { checkRateLimit, getClientIdentifier, RATE_LIMITS } from '@/lib/rate-limit';
+import { getAppUrl, getServerAdminEmail } from '@/lib/site-defaults';
 
 type OrderRow = {
   id: string;
@@ -51,7 +54,7 @@ export async function POST(req: Request) {
     );
 
     if (!order) {
-      console.error('[Payment] Order not found:', orderId);
+      console.error('[Payment] Order not found');
       return NextResponse.json({ success: false, message: 'Order not found' }, { status: 404 });
     }
 
@@ -66,13 +69,13 @@ export async function POST(req: Request) {
 
     const orderRef = order.order_number || orderId;
     const requestUrl = new URL(req.url);
-    const baseUrl = (process.env.NEXT_PUBLIC_APP_URL || requestUrl.origin).replace(/\/+$/, '');
+    const baseUrl = (getAppUrl() || requestUrl.origin).replace(/\/+$/, '');
     const uniqueRef = `${orderRef}-R${Date.now()}`;
 
     const payload = {
       type: 1,
       amount: amount.toString(),
-      email: process.env.MOOLRE_MERCHANT_EMAIL || 'admin@mamator.com',
+      email: process.env.MOOLRE_MERCHANT_EMAIL || getServerAdminEmail(),
       externalref: uniqueRef,
       callback: `${baseUrl}/api/payment/moolre/callback`,
       redirect: `${baseUrl}/order-success?order=${orderRef}&payment_success=true`,
@@ -85,23 +88,47 @@ export async function POST(req: Request) {
       },
     };
 
-    const response = await fetch('https://api.moolre.com/embed/link', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-API-USER': process.env.MOOLRE_API_USER,
-        'X-API-PUBKEY': process.env.MOOLRE_API_PUBKEY,
+    const response = await fetchWithTimeout(
+      'https://api.moolre.com/embed/link',
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-API-USER': process.env.MOOLRE_API_USER,
+          'X-API-PUBKEY': process.env.MOOLRE_API_PUBKEY,
+        },
+        body: JSON.stringify(payload),
       },
-      body: JSON.stringify(payload),
-    });
+      20_000
+    );
 
     const result = await response.json();
 
     if (result.status === 1 && result.data?.authorization_url) {
+      try {
+        await recordPaymentAttempt({
+          orderId: order.id,
+          orderNumber: orderRef,
+          externalRef: uniqueRef,
+          amount,
+          currency: 'GHS',
+          gatewayReference: result.data.reference ? String(result.data.reference) : null,
+          rawInit: {
+            amount,
+            currency: 'GHS',
+            externalref: uniqueRef,
+            callback: payload.callback,
+          },
+        });
+      } catch (recordErr: unknown) {
+        console.error('[Payment] Failed to record payment attempt:', recordErr);
+      }
+
       return NextResponse.json({
         success: true,
         url: result.data.authorization_url,
         reference: result.data.reference,
+        externalRef: uniqueRef,
       });
     }
 

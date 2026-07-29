@@ -1,21 +1,24 @@
 import { Resend } from 'resend';
 import { query } from '@/lib/db';
 import { escapeHtml } from '@/lib/sanitize';
+import {
+    getAppUrl,
+    getServerAdminEmail,
+    getServerEmailFrom,
+    getSiteName,
+    getSmsSenderId,
+} from '@/lib/site-defaults';
 
 const resend = new Resend(process.env.RESEND_API_KEY || 'missing_api_key');
-const SITE_HOST = (process.env.NEXT_PUBLIC_APP_URL || 'https://mamator.com')
-    .replace(/^https?:\/\//, '')
-    .split('/')[0];
-const ADMIN_EMAIL = process.env.ADMIN_EMAIL || process.env.MOOLRE_MERCHANT_EMAIL || `admin@${SITE_HOST}`;
-const EMAIL_FROM =
-    process.env.EMAIL_FROM ||
-    `${process.env.NEXT_PUBLIC_SITE_NAME || 'Mamator'} <noreply@${SITE_HOST}>`;
+const ADMIN_EMAIL =
+    process.env.ADMIN_EMAIL || process.env.MOOLRE_MERCHANT_EMAIL || getServerAdminEmail();
+const EMAIL_FROM = process.env.EMAIL_FROM || getServerEmailFrom();
 const BRAND = {
-    name: process.env.NEXT_PUBLIC_SITE_NAME || 'Mamator',
+    name: getSiteName(),
     color: '#2563eb',
     colorLight: '#eff6ff',
     colorDark: '#064e3b',
-    url: (process.env.NEXT_PUBLIC_APP_URL || 'https://mamator.com').replace(/\/+$/, ''),
+    url: getAppUrl(),
     phone: process.env.NEXT_PUBLIC_SITE_PHONE || '',
 };
 
@@ -150,24 +153,29 @@ export async function sendSMS({ to, message }: { to: string; message: string }) 
     const recipient = formatPhoneNumber(to);
 
     try {
+        const { fetchWithTimeout } = await import('@/lib/http/fetch-timeout');
         console.log(`[SMS] Sending to ${maskPhone(recipient)}`);
-        const response = await fetch('https://api.moolre.com/open/sms/send', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-API-VASKEY': smsVasKey
+        const response = await fetchWithTimeout(
+            'https://api.moolre.com/open/sms/send',
+            {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-API-VASKEY': smsVasKey,
+                },
+                body: JSON.stringify({
+                    type: 1,
+                    senderid: process.env.MOOLRE_SMS_SENDER_ID || getSmsSenderId(),
+                    messages: [
+                        {
+                            recipient: recipient,
+                            message: message,
+                        },
+                    ],
+                }),
             },
-            body: JSON.stringify({
-                type: 1,
-                senderid: process.env.MOOLRE_SMS_SENDER_ID || 'Mamator',
-                messages: [
-                    {
-                        recipient: recipient,
-                        message: message
-                    }
-                ]
-            })
-        });
+            15_000
+        );
 
         const contentType = response.headers.get('content-type') || '';
         if (!contentType.includes('application/json')) {
@@ -179,11 +187,12 @@ export async function sendSMS({ to, message }: { to: string; message: string }) 
         const result = await response.json();
         console.log('[SMS] Result:', result.status === 1 ? 'Success' : 'Failed', '| Code:', result.code);
         if (result.status !== 1) {
-            console.log('[SMS] Full Response:', JSON.stringify(result, null, 2));
+            console.error('[SMS] Provider rejected message');
         }
         return result;
-    } catch (error: any) {
-        console.error('[SMS] Error:', error.message);
+    } catch (error: unknown) {
+        const messageText = error instanceof Error ? error.message : 'unknown';
+        console.error('[SMS] Error:', messageText);
         return null;
     }
 }

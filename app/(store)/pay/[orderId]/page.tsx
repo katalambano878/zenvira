@@ -61,8 +61,6 @@ export default function PaymentPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           orderId: order.order_number,
-          amount: order.total,
-          customerEmail: order.email
         })
       });
 

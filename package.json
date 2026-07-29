@@ -42,7 +42,8 @@
     "lint": "next lint",
     "db:migrate": "node scripts/migrate-db.mjs",
     "create-admin": "node scripts/create-admin-user.mjs",
-    "images:compress": "node scripts/compress-images.mjs"
+    "images:compress": "node scripts/compress-images.mjs",
+    "test:payments": "node scripts/test-moolre-helpers.mjs"
   },
   "version": "0.1.0"
 }

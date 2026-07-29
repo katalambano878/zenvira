@@ -1,5 +1,7 @@
 /** Shared helpers to generate product SEO fields. */
 
+import { getSiteName } from '@/lib/site-defaults';
+
 export function slugifyProduct(value: string): string {
   return value
     .toLowerCase()
@@ -29,7 +31,7 @@ export type ProductSeoFields = {
 };
 
 export function buildProductSeo(input: ProductSeoInput): ProductSeoFields {
-  const siteName = (input.siteName || process.env.NEXT_PUBLIC_SITE_NAME || 'Mamator').trim();
+  const siteName = (input.siteName || getSiteName()).trim();
   const name = (input.name || 'Product').trim();
   const category = (input.categoryName || '').trim();
   const plainDesc = stripHtml(input.description || '');

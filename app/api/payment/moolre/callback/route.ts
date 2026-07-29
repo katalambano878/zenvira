@@ -1,6 +1,12 @@
+import { createHash } from 'crypto';
 import { NextResponse } from 'next/server';
 import { query, queryOne } from '@/lib/db';
 import { sendOrderConfirmation } from '@/lib/notifications';
+import {
+  markPaymentAttemptStatus,
+  recordCallbackEvent,
+  stripPaymentAttemptSuffix,
+} from '@/lib/payments/moolre';
 import { checkRateLimit, getClientIdentifier, RATE_LIMITS } from '@/lib/rate-limit';
 
 type OrderJson = Record<string, unknown> & {
@@ -20,8 +26,6 @@ async function markOrderPaid(orderRef: string, moolreRef: string): Promise<Order
 }
 
 export async function POST(req: Request) {
-  console.log('[Callback] POST received at', new Date().toISOString());
-
   try {
     const clientId = getClientIdentifier(req);
     const rateLimitResult = checkRateLimit(`callback:${clientId}`, RATE_LIMITS.callback);
@@ -52,10 +56,9 @@ export async function POST(req: Request) {
     }
 
     const expectedSecret = process.env.MOOLRE_CALLBACK_SECRET;
-    if (expectedSecret) {
-      if (!body.secret || body.secret !== expectedSecret) {
-        return NextResponse.json({ success: false, message: 'Invalid callback signature' }, { status: 403 });
-      }
+    const signatureOk = Boolean(expectedSecret) && body.secret === expectedSecret;
+    if (expectedSecret && !signatureOk) {
+      return NextResponse.json({ success: false, message: 'Invalid callback signature' }, { status: 403 });
     }
 
     const data = (body.data || {}) as Record<string, unknown>;
@@ -70,7 +73,7 @@ export async function POST(req: Request) {
     const rawRefStr = rawExternalRef ? String(rawExternalRef) : '';
     const metadata = (data.metadata || body.metadata || {}) as Record<string, unknown>;
     const merchantOrderRef = rawRefStr
-      ? rawRefStr.replace(/-R\d+$/, '')
+      ? stripPaymentAttemptSuffix(rawRefStr)
       : String(metadata.original_order_number || '');
 
     const moolreReference = String(
@@ -83,6 +86,35 @@ export async function POST(req: Request) {
 
     if (!merchantOrderRef) {
       return NextResponse.json({ success: false, message: 'Missing order reference' }, { status: 400 });
+    }
+
+    const payloadHash = createHash('sha256')
+      .update(JSON.stringify({ merchantOrderRef, moolreReference, apiStatus, txStatus, amount: data.amount }))
+      .digest('hex');
+
+    let eventId: string | null = null;
+    try {
+      const recorded = await recordCallbackEvent({
+        gateway: 'moolre',
+        eventType: 'payment_callback',
+        externalEventId: moolreReference,
+        reference: merchantOrderRef,
+        payloadHash,
+        signatureOk: expectedSecret ? signatureOk : false,
+        payload: {
+          merchantOrderRef,
+          moolreReference,
+          apiStatus,
+          txStatus,
+          amount: data.amount ?? body.amount ?? null,
+        },
+      });
+      eventId = recorded.id;
+      if (recorded.duplicate) {
+        return NextResponse.json({ success: true, message: 'Duplicate callback ignored' });
+      }
+    } catch (eventErr: unknown) {
+      console.error('[Callback] Event record failed');
     }
 
     const apiOk = apiStatus === 1 || apiStatus === '1';
@@ -100,6 +132,16 @@ export async function POST(req: Request) {
       }
 
       if (existingOrder.payment_status === 'paid') {
+        if (rawRefStr) {
+          try {
+            await markPaymentAttemptStatus(rawRefStr, 'successful', {
+              gatewayReference: moolreReference,
+              amountPaid: Number(existingOrder.total),
+            });
+          } catch {
+            /* best-effort */
+          }
+        }
         return NextResponse.json({ success: true, message: 'Order already processed' });
       }
 
@@ -123,21 +165,45 @@ export async function POST(req: Request) {
         return NextResponse.json({ success: false, message: 'Database update failed' }, { status: 500 });
       }
 
+      if (rawRefStr) {
+        try {
+          await markPaymentAttemptStatus(rawRefStr, 'successful', {
+            gatewayReference: moolreReference,
+            amountPaid: callbackAmount ?? Number(existingOrder.total),
+          });
+        } catch {
+          /* best-effort */
+        }
+      }
+
+      if (eventId) {
+        try {
+          await query(
+            `UPDATE payment_callback_events
+             SET processing_status = 'processed', processed_at = now(), attempts = attempts + 1
+             WHERE id = $1::uuid`,
+            [eventId]
+          );
+        } catch {
+          /* best-effort */
+        }
+      }
+
       if (orderJson.email) {
         try {
           await query(`SELECT update_customer_stats($1, $2)`, [
             String(orderJson.email),
             Number(orderJson.total),
           ]);
-        } catch (statsError: unknown) {
-          console.error('[Callback] Customer stats failed:', statsError);
+        } catch {
+          console.error('[Callback] Customer stats failed');
         }
       }
 
       try {
         await sendOrderConfirmation(orderJson);
-      } catch (notifyError: unknown) {
-        console.error('[Callback] Notification failed:', notifyError);
+      } catch {
+        console.error('[Callback] Notification failed');
       }
 
       return NextResponse.json({ success: true, message: 'Payment verified and Order Updated' });
@@ -146,7 +212,7 @@ export async function POST(req: Request) {
     await query(
       `UPDATE orders SET payment_status = 'failed'::payment_status,
        metadata = COALESCE(metadata, '{}'::jsonb) || $2::jsonb
-       WHERE order_number = $1`,
+       WHERE order_number = $1 AND payment_status <> 'paid'::payment_status`,
       [
         merchantOrderRef,
         JSON.stringify({
@@ -156,14 +222,27 @@ export async function POST(req: Request) {
       ]
     );
 
+    if (rawRefStr) {
+      try {
+        await markPaymentAttemptStatus(rawRefStr, 'failed', {
+          gatewayReference: moolreReference,
+          failureReason: String(body.message || 'Payment failed'),
+        });
+      } catch {
+        /* best-effort */
+      }
+    }
+
     return NextResponse.json({ success: false, message: 'Payment not successful' });
   } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : 'Internal server error';
-    console.error('[Callback] Critical Error:', message);
+    console.error('[Callback] Critical Error');
     return NextResponse.json({ success: false, message: 'Internal server error' }, { status: 500 });
   }
 }
 
 export async function GET() {
-  return NextResponse.json({ message: 'Moolre callback endpoint ready', timestamp: new Date().toISOString() });
+  return NextResponse.json({
+    message: 'Moolre callback endpoint ready',
+    timestamp: new Date().toISOString(),
+  });
 }

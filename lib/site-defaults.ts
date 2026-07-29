@@ -17,6 +17,11 @@ export function getSiteName(): string {
   return env('NEXT_PUBLIC_SITE_NAME') || 'New Project';
 }
 
+/** Canonical site URL without trailing slash */
+export function getAppUrl(): string {
+  return (env('NEXT_PUBLIC_APP_URL') || 'http://localhost:3000').replace(/\/+$/, '');
+}
+
 /** Short line for meta / hero */
 export function getSiteTagline(): string {
   return env('NEXT_PUBLIC_SITE_TAGLINE') || 'Build something exceptional.';

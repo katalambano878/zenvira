@@ -1,3 +1,4 @@
+import { getSiteName } from '@/lib/site-defaults';
 import {
   absoluteAsset,
   BRAND_ASSETS,
@@ -19,7 +20,7 @@ export function getRootStructuredData() {
         '@type': 'Organization',
         '@id': `${siteUrl}/#organization`,
         name: SITE_LEGAL_NAME,
-        alternateName: 'Mamator',
+        alternateName: getSiteName(),
         url: siteUrl,
         logo: {
           '@type': 'ImageObject',
@@ -57,7 +58,7 @@ export function getRootStructuredData() {
         '@type': 'WebSite',
         '@id': `${siteUrl}/#website`,
         url: siteUrl,
-        name: 'Mamator',
+        name: getSiteName(),
         description: SITE_DEFAULT_DESCRIPTION,
         publisher: { '@id': `${siteUrl}/#organization` },
         inLanguage: 'en-GH',
