@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { supabase } from '@/lib/supabase';
+import { api } from '@/lib/api';
 
 interface Order {
   id: string;
@@ -26,37 +26,25 @@ export default function OrderHistory() {
   useEffect(() => {
     async function fetchOrders() {
       try {
-        const { data: { session } } = await supabase.auth.getSession();
-        if (!session) return;
+        const me = await api<{ user: { id: string } | null }>('/api/auth/me').catch(() => null);
+        if (!me?.user) return;
 
-        const { data, error } = await supabase
-          .from('orders')
-          .select(`
-                    *,
-                    order_items (*)
-                `)
-          .eq('user_id', session.user.id)
-          .order('created_at', { ascending: false });
-
-        if (error) throw error;
-
-        if (data) {
-          const formattedOrders = data.map((order: any) => ({
-            id: order.id,
-            orderNumber: order.order_number,
-            date: order.created_at,
-            status: order.status,
-            total: order.total,
-            items: order.order_items.map((item: any) => ({
-              id: item.id,
-              name: item.product_name,
-              image: item.metadata?.image || 'https://via.placeholder.com/150',
-              quantity: item.quantity,
-              price: item.unit_price
-            }))
-          }));
-          setOrders(formattedOrders);
-        }
+        const data = await api<any[]>('/api/orders');
+        const formattedOrders = data.map((order: any) => ({
+          id: order.id,
+          orderNumber: order.order_number,
+          date: order.created_at,
+          status: order.status,
+          total: order.total,
+          items: (order.order_items || []).map((item: any) => ({
+            id: item.id,
+            name: item.product_name,
+            image: item.metadata?.image || 'https://via.placeholder.com/150',
+            quantity: item.quantity,
+            price: item.unit_price,
+          })),
+        }));
+        setOrders(formattedOrders);
       } catch (err) {
         console.error('Error fetching orders:', err);
       } finally {
@@ -77,13 +65,12 @@ export default function OrderHistory() {
         return 'bg-yellow-100 text-yellow-700';
       case 'cancelled':
         return 'bg-red-100 text-red-700';
-      default: // pending
+      default:
         return 'bg-gray-100 text-gray-700';
     }
   };
 
   const handleReorder = (order: Order) => {
-    // Implement reorder logic (add items back to cart)
     console.log('Reordering:', order);
     alert('Reorder feature coming soon!');
   };
@@ -142,7 +129,7 @@ export default function OrderHistory() {
                       {new Date(order.date).toLocaleDateString('en-GB', {
                         day: 'numeric',
                         month: 'short',
-                        year: 'numeric'
+                        year: 'numeric',
                       })}
                     </p>
                   </div>

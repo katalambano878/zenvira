@@ -9,26 +9,26 @@ function env(key: string): string {
 
 /** Text logo / wordmark (header, footer, PWA) */
 export function getWordmark(): string {
-  return env('NEXT_PUBLIC_WORDMARK') || 'Zenvira';
+  return env('NEXT_PUBLIC_WORDMARK') || 'New Project';
 }
 
 /** Display name (store / site title) */
 export function getSiteName(): string {
-  return env('NEXT_PUBLIC_SITE_NAME') || 'Your Store';
+  return env('NEXT_PUBLIC_SITE_NAME') || 'New Project';
 }
 
 /** Short line for meta / hero */
 export function getSiteTagline(): string {
-  return env('NEXT_PUBLIC_SITE_TAGLINE') || 'Online store';
+  return env('NEXT_PUBLIC_SITE_TAGLINE') || 'Build something exceptional.';
 }
 
 export function getContactEmail(): string {
-  return env('NEXT_PUBLIC_CONTACT_EMAIL') || 'contact@example.com';
+  return env('NEXT_PUBLIC_CONTACT_EMAIL') || 'hello@example.com';
 }
 
 /** Human-readable phone for display */
 export function getContactPhoneDisplay(): string {
-  return env('NEXT_PUBLIC_CONTACT_PHONE');
+  return env('NEXT_PUBLIC_CONTACT_PHONE') || '+1 000 000 0000';
 }
 
 /** E.164-style for tel: / SMS (best effort from display or raw env) */
@@ -52,32 +52,32 @@ export function sanitizeAddressDisplay(addr: string | undefined | null): string 
   return t;
 }
 
-/** Default social links (override with NEXT_PUBLIC_SOCIAL_* or CMS) */
+/** Default social links — empty unless set via env or CMS */
 export function getDefaultSocialLinks() {
   return {
-    instagram: env('NEXT_PUBLIC_SOCIAL_INSTAGRAM') || 'https://www.instagram.com/_adjoatee/',
-    youtube: env('NEXT_PUBLIC_SOCIAL_YOUTUBE') || 'https://www.youtube.com/@adjoatee',
-    snapchat: env('NEXT_PUBLIC_SOCIAL_SNAPCHAT') || 'https://www.snapchat.com/add/badgyaltee.xx',
+    instagram: env('NEXT_PUBLIC_SOCIAL_INSTAGRAM'),
+    youtube: env('NEXT_PUBLIC_SOCIAL_YOUTUBE'),
+    snapchat: env('NEXT_PUBLIC_SOCIAL_SNAPCHAT'),
   };
 }
 
 export function getSocialInstagramHandle(): string {
-  return env('NEXT_PUBLIC_SOCIAL_INSTAGRAM_HANDLE') || '_adjoatee';
+  return env('NEXT_PUBLIC_SOCIAL_INSTAGRAM_HANDLE');
 }
 
 export function getSocialYoutubeHandle(): string {
-  return env('NEXT_PUBLIC_SOCIAL_YOUTUBE_HANDLE') || '@adjoatee';
+  return env('NEXT_PUBLIC_SOCIAL_YOUTUBE_HANDLE');
 }
 
 export function getSocialSnapchatHandle(): string {
-  return env('NEXT_PUBLIC_SOCIAL_SNAPCHAT_HANDLE') || 'badgyaltee.xx';
+  return env('NEXT_PUBLIC_SOCIAL_SNAPCHAT_HANDLE');
 }
 
 export function getDefaultMetaDescription(): string {
   const tag = getSiteTagline();
   const addr = getContactAddress();
   if (addr) return `${tag}. ${addr}.`;
-  return `${tag}. Shop online.`;
+  return `${tag} This repository is a clean foundation for a new digital product.`;
 }
 
 export function getDefaultTitleSuffix(): string {

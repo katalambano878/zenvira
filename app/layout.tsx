@@ -35,9 +35,8 @@ export const metadata: Metadata = {
   keywords: [
     siteName,
     "online store",
-    "retail",
-    "wholesale",
     "e-commerce",
+    "starter",
   ],
   authors: [{ name: siteName }],
   creator: siteName,
@@ -45,22 +44,19 @@ export const metadata: Metadata = {
   applicationName: siteName,
   referrer: "origin-when-cross-origin",
   robots: {
-    index: true,
-    follow: true,
+    index: false,
+    follow: false,
     googleBot: {
-      index: true,
-      follow: true,
-      'max-video-preview': -1,
-      'max-image-preview': 'large',
-      'max-snippet': -1,
+      index: false,
+      follow: false,
     },
   },
   icons: {
     icon: [
-      { url: '/neww.png', sizes: 'any', type: 'image/png' },
+      { url: '/logo.png', sizes: 'any', type: 'image/png' },
     ],
-    shortcut: '/neww.png',
-    apple: '/neww.png',
+    shortcut: '/logo.png',
+    apple: '/logo.png',
   },
   manifest: '/manifest.json',
   appleWebApp: {
@@ -85,7 +81,7 @@ export const metadata: Metadata = {
     siteName,
     images: [
       {
-        url: "/neww.png",
+        url: "/logo.png",
         width: 1200,
         height: 630,
         alt: `${siteName} — ${getSiteTagline()}`,
@@ -97,7 +93,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: titleSuffix,
     description: metaDesc,
-    images: ["/neww.png"],
+    images: ["/logo.png"],
   },
   alternates: {
     canonical: siteUrl,
@@ -114,7 +110,7 @@ function buildOrganizationJsonLd(): Record<string, unknown> {
     "@type": "Organization",
     name: siteName,
     url: siteUrl,
-    logo: `${siteUrl.replace(/\/$/, '')}/neww.png`,
+    logo: `${siteUrl.replace(/\/$/, '')}/logo.png`,
     description: metaDesc,
   };
   const addr = getContactAddress();
@@ -122,7 +118,6 @@ function buildOrganizationJsonLd(): Record<string, unknown> {
     org.address = {
       "@type": "PostalAddress",
       streetAddress: addr,
-      addressCountry: "GH",
     };
   }
   const tel = getContactPhoneTel();
@@ -155,11 +150,11 @@ export default function RootLayout({
         <meta name="msapplication-TileColor" content="#2563eb" />
         <meta name="msapplication-tap-highlight" content="no" />
 
-        <link rel="icon" href="/neww.png" type="image/png" sizes="any" />
-        <link rel="shortcut icon" href="/neww.png" />
+        <link rel="icon" href="/logo.png" type="image/png" sizes="any" />
+        <link rel="shortcut icon" href="/logo.png" />
 
-        <link rel="apple-touch-icon" href="/neww.png" />
-        <link rel="apple-touch-startup-image" href="/neww.png" />
+        <link rel="apple-touch-icon" href="/logo.png" />
+        <link rel="apple-touch-startup-image" href="/logo.png" />
 
         <link
           href="https://cdn.jsdelivr.net/npm/remixicon@4.1.0/fonts/remixicon.css"

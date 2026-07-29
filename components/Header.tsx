@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import MiniCart from './MiniCart';
 import { useCart } from '@/context/CartContext';
-import { supabase } from '@/lib/supabase';
+import { api } from '@/lib/api';
 import { useCMS } from '@/context/CMSContext';
 import { getWordmark } from '@/lib/site-defaults';
 import AnnouncementBar from './AnnouncementBar';
@@ -19,7 +19,7 @@ export default function Header() {
   const { cartCount, isCartOpen, setIsCartOpen } = useCart();
   const { getSetting } = useCMS();
 
-  const siteName = getSetting('site_name') || (process.env.NEXT_PUBLIC_SITE_NAME || 'Your Store');
+  const siteName = getSetting('site_name') || (process.env.NEXT_PUBLIC_SITE_NAME || 'New Project');
   const wordmark = getWordmark();
 
   useEffect(() => {
@@ -32,21 +32,19 @@ export default function Header() {
     updateWishlistCount();
     window.addEventListener('wishlistUpdated', updateWishlistCount);
 
-    // Auth logic
     const checkUser = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      setUser(session?.user ?? null);
+      try {
+        const me = await api<{ user: { id: string; email: string } | null }>('/api/auth/me');
+        setUser(me.user);
+      } catch {
+        setUser(null);
+      }
     };
 
     checkUser();
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null);
-    });
-
     return () => {
       window.removeEventListener('wishlistUpdated', updateWishlistCount);
-      subscription.unsubscribe();
     };
   }, []);
 

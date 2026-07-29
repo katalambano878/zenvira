@@ -1,5 +1,5 @@
 // Storefront PWA service worker
-const CACHE_VERSION = 'store-v2.7';
+const CACHE_VERSION = 'store-v3.0-pg';
 const STATIC_CACHE = `static-${CACHE_VERSION}`;
 const DYNAMIC_CACHE = `dynamic-${CACHE_VERSION}`;
 const IMAGE_CACHE = `images-${CACHE_VERSION}`;
@@ -14,7 +14,7 @@ const STATIC_ASSETS = [
   '/account',
   '/categories',
   '/offline',
-  '/neww.png',
+  '/logo.png',
 ];
 
 // Cache size limits
@@ -34,7 +34,7 @@ async function trimCache(cacheName, maxItems) {
 
 // Install: pre-cache static assets
 self.addEventListener('install', (event) => {
-  console.log('[SW] Installing v2.2...');
+  console.log('[SW] Installing v3.0-pg...');
   event.waitUntil(
     caches.open(STATIC_CACHE)
       .then((cache) => {
@@ -224,8 +224,8 @@ self.addEventListener('push', (event) => {
   const data = event.data.json();
   const options = {
     body: data.body || 'New update from the store',
-    icon: '/neww.png',
-    badge: '/neww.png',
+    icon: '/logo.png',
+    badge: '/logo.png',
     vibrate: [100, 50, 100],
     data: {
       url: data.url || '/',
@@ -239,7 +239,7 @@ self.addEventListener('push', (event) => {
 
   event.waitUntil(
     self.registration.showNotification(
-      data.title || 'Your Store',
+      data.title || 'New Project',
       options
     )
   );

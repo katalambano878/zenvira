@@ -4,14 +4,14 @@ import Link from 'next/link';
 import { useState } from 'react';
 
 export default function ProductEditor({ productId }: { productId: string }) {
-  const [productName, setProductName] = useState('Premium Leather Crossbody Bag');
-  const [category, setCategory] = useState('Bags & Accessories');
-  const [price, setPrice] = useState('289.00');
-  const [comparePrice, setComparePrice] = useState('349.00');
-  const [sku, setSku] = useState('LCB-FG-001');
-  const [stock, setStock] = useState('15');
+  const [productName, setProductName] = useState('Product name');
+  const [category, setCategory] = useState('General');
+  const [price, setPrice] = useState('0.00');
+  const [comparePrice, setComparePrice] = useState('');
+  const [sku, setSku] = useState('SKU-001');
+  const [stock, setStock] = useState('0');
   const [lowStockThreshold, setLowStockThreshold] = useState('5');
-  const [description, setDescription] = useState('Crafted from premium full-grain leather, this sophisticated crossbody bag combines timeless elegance with modern functionality. Features adjustable strap, secure zip closure, and multiple interior pockets.');
+  const [description, setDescription] = useState('Product description');
   const [status, setStatus] = useState('Active');
   const [featured, setFeatured] = useState(true);
   const [activeTab, setActiveTab] = useState('general');
@@ -22,12 +22,7 @@ export default function ProductEditor({ productId }: { productId: string }) {
     { id: 3, name: 'Cognac Brown', sku: 'LCB-CG-003', price: 299.00, stock: 12 }
   ];
 
-  const images = [
-    'https://readdy.ai/api/search-image?query=elegant%20premium%20leather%20crossbody%20bag%20in%20deep%20forest%20green%20color%20front%20view%20on%20clean%20white%20studio%20background&width=400&height=400&seq=editprod1&orientation=squarish',
-    'https://readdy.ai/api/search-image?query=elegant%20premium%20leather%20crossbody%20bag%20side%20detail%20view%20showing%20texture%20on%20white%20background&width=400&height=400&seq=editprod2&orientation=squarish',
-    'https://readdy.ai/api/search-image?query=elegant%20premium%20leather%20crossbody%20bag%20interior%20compartment%20view%20on%20white%20background&width=400&height=400&seq=editprod3&orientation=squarish',
-    'https://readdy.ai/api/search-image?query=elegant%20premium%20leather%20crossbody%20bag%20lifestyle%20shot%20with%20model%20on%20white%20background&width=400&height=400&seq=editprod4&orientation=squarish'
-  ];
+  const images = ['/logo.png'];
 
   const tabs = [
     { id: 'general', label: 'General', icon: 'ri-information-line' },
@@ -126,6 +121,7 @@ export default function ProductEditor({ productId }: { productId: string }) {
                     onChange={(e) => setCategory(e.target.value)}
                     className="w-full px-4 py-3 pr-8 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 cursor-pointer"
                   >
+                    <option>General</option>
                     <option>Bags & Accessories</option>
                     <option>Home Decor</option>
                     <option>Textiles</option>
@@ -384,7 +380,7 @@ export default function ProductEditor({ productId }: { productId: string }) {
                 </label>
                 <input
                   type="text"
-                  defaultValue="Premium Leather Crossbody Bag - Elegant & Functional"
+                  defaultValue="Product name"
                   className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 />
                 <p className="text-sm text-gray-500 mt-2">60 characters recommended</p>
@@ -397,7 +393,7 @@ export default function ProductEditor({ productId }: { productId: string }) {
                 <textarea
                   rows={3}
                   maxLength={500}
-                  defaultValue="Quality product sourced and inspected for durability and style. Available for retail and wholesale orders."
+                  defaultValue="Product description"
                   className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"
                 />
                 <p className="text-sm text-gray-500 mt-2">160 characters recommended</p>
@@ -413,7 +409,7 @@ export default function ProductEditor({ productId }: { productId: string }) {
                   </span>
                   <input
                     type="text"
-                    defaultValue="premium-leather-crossbody-bag"
+                    defaultValue="product-name"
                     className="flex-1 px-4 py-3 border-2 border-gray-300 rounded-r-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   />
                 </div>
@@ -425,7 +421,7 @@ export default function ProductEditor({ productId }: { productId: string }) {
                 </label>
                 <input
                   type="text"
-                  defaultValue="Your store name, key products, location. Retail & wholesale."
+                  defaultValue="product, category, brand"
                   className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 />
                 <p className="text-sm text-gray-500 mt-2">Separate keywords with commas</p>

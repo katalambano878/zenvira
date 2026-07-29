@@ -2,21 +2,17 @@
 
 import { useState, useTransition } from 'react';
 import { testSmsAction } from './actions';
-import { supabase } from '@/lib/supabase';
 
 export default function TestSmsPage() {
     const [isPending, startTransition] = useTransition();
     const [result, setResult] = useState<any>(null);
-    const [phone, setPhone] = useState('024'); // Common start
+    const [phone, setPhone] = useState('024');
     const [message, setMessage] = useState('Test message from Standard Store Admin');
 
     const handleSend = () => {
         setResult(null);
         startTransition(async () => {
-            // Get auth token to pass to server action
-            const { data: { session } } = await supabase.auth.getSession();
-            const token = session?.access_token || '';
-            const res = await testSmsAction(phone, message, token);
+            const res = await testSmsAction(phone, message);
             setResult(res);
         });
     };

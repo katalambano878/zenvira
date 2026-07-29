@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { supabase } from '@/lib/supabase';
 import Link from 'next/link';
 import { sanitizeAddressDisplay } from '@/lib/site-defaults';
 
@@ -21,11 +20,11 @@ export default function AnnouncementBar() {
     const [dismissed, setDismissed] = useState<Set<string>>(new Set());
 
     useEffect(() => {
-        fetchBanners();
+        // Banners API not wired yet — default bar only
+        setBanners([]);
     }, []);
 
     useEffect(() => {
-        // Auto-rotate banners if multiple
         if (banners.length > 1) {
             const interval = setInterval(() => {
                 setCurrentIndex((prev) => (prev + 1) % banners.length);
@@ -34,36 +33,11 @@ export default function AnnouncementBar() {
         }
     }, [banners.length]);
 
-    const fetchBanners = async () => {
-        try {
-            const now = new Date().toISOString();
-
-            const { data, error } = await supabase
-                .from('banners')
-                .select('*')
-                .eq('is_active', true)
-                .eq('position', 'top')
-                .or(`start_date.is.null,start_date.lte.${now}`)
-                .or(`end_date.is.null,end_date.gte.${now}`)
-                .order('sort_order', { ascending: true });
-
-            if (error) {
-                console.log('Banners table may not exist yet');
-                return;
-            }
-
-            setBanners(data || []);
-        } catch (error) {
-            console.error('Error fetching banners:', error);
-        }
-    };
-
     const dismissBanner = (id: string) => {
         const newDismissed = new Set(dismissed);
         newDismissed.add(id);
         setDismissed(newDismissed);
 
-        // Move to next banner if available
         const remainingBanners = banners.filter(b => !newDismissed.has(b.id));
         if (remainingBanners.length > 0) {
             setCurrentIndex(0);
@@ -73,7 +47,6 @@ export default function AnnouncementBar() {
     const visibleBanners = banners.filter(b => !dismissed.has(b.id));
 
     if (visibleBanners.length === 0) {
-        // Show default banner if no custom banners
         return (
             <div className="bg-blue-800 text-white py-2 text-center text-sm">
                 <p>
@@ -116,7 +89,6 @@ export default function AnnouncementBar() {
                 )}
             </div>
 
-            {/* Dismiss button */}
             <button
                 onClick={() => dismissBanner(currentBanner.id)}
                 className="absolute right-4 top-1/2 -translate-y-1/2 opacity-60 hover:opacity-100 transition-opacity"
@@ -126,7 +98,6 @@ export default function AnnouncementBar() {
                 <i className="ri-close-line"></i>
             </button>
 
-            {/* Dots indicator for multiple banners */}
             {visibleBanners.length > 1 && (
                 <div className="absolute left-4 top-1/2 -translate-y-1/2 flex gap-1">
                     {visibleBanners.map((_, idx) => (

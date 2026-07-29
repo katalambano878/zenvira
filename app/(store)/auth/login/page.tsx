@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useState } from 'react';
-import { supabase } from '@/lib/supabase';
+import { api } from '@/lib/api';
 import { useRecaptcha } from '@/hooks/useRecaptcha';
 
 export default function LoginPage() {
@@ -52,33 +52,15 @@ export default function LoginPage() {
     }
 
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email: formData.email,
-        password: formData.password,
+      await api('/api/auth/login', {
+        method: 'POST',
+        json: { email: formData.email, password: formData.password },
       });
-
-      if (error) {
-        const friendlyMessages: Record<string, string> = {
-          'Invalid login credentials': 'Wrong email or password. Please double-check and try again.',
-          'Email not confirmed': 'Your email has not been confirmed yet. Check your inbox for a confirmation link.',
-          'User not found': 'No account found with this email. Did you mean to sign up?',
-        };
-        setAuthError(friendlyMessages[error.message] || error.message);
-        setIsLoading(false);
-        return;
-      }
-
-      if (data.session) {
-        window.location.assign('/account');
-        return;
-      }
-
-      setAuthError(
-        'Sign-in did not return a session. Your email may need confirmation — check your inbox.'
-      );
-    } catch (error: any) {
+      window.location.assign('/account');
+      return;
+    } catch (error: unknown) {
       console.error('Login error:', error);
-      setAuthError(error.message || 'Failed to sign in. Please check your credentials.');
+      setAuthError(error instanceof Error ? error.message : 'Failed to sign in. Please check your credentials.');
     } finally {
       setIsLoading(false);
     }

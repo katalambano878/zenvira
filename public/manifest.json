@@ -1,7 +1,7 @@
 {
-  "name": "Your Store",
-  "short_name": "Store",
-  "description": "Online store. Set NEXT_PUBLIC_SITE_NAME and related env vars to customize.",
+  "name": "New Project",
+  "short_name": "New Project",
+  "description": "Starter e-commerce storefront. Customize via env vars and CMS settings.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",
@@ -9,7 +9,7 @@
   "orientation": "portrait-primary",
   "icons": [
     {
-      "src": "/neww.png",
+      "src": "/logo.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"

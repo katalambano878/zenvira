@@ -42,17 +42,17 @@ export default function FAQsPage() {
     {
       category: 'shipping',
       question: 'What are your delivery times?',
-      answer: 'Standard delivery takes 2-5 business days within Ghana. Express delivery (next-day) is available for Accra and Kumasi. Orders placed before 2pm are dispatched same day. Remote areas may take 5-7 business days.'
+      answer: 'Delivery times depend on your location and shipping method. Update this placeholder with your actual delivery schedule.'
     },
     {
       category: 'shipping',
       question: 'How much does shipping cost?',
-      answer: 'Standard shipping costs GHS 20. Express delivery costs GHS 40. Orders over GHS 300 qualify for FREE standard shipping. Store pickup is also available at no charge from our Accra location.'
+      answer: 'Shipping costs are configured in your store settings. Replace this placeholder with your standard and express rates.'
     },
     {
       category: 'shipping',
-      question: 'Do you ship outside Ghana?',
-      answer: 'Currently, we only ship within Ghana. We\'re working on expanding to neighbouring West African countries. Sign up for our newsletter to be notified when international shipping becomes available.'
+      question: 'Do you ship internationally?',
+      answer: 'Shipping regions are configurable. Update this answer with the countries or regions you deliver to.'
     },
     {
       category: 'shipping',
@@ -144,7 +144,7 @@ export default function FAQsPage() {
       <PageHero
         title="Frequently Asked Questions"
         subtitle="Find quick answers to common questions about ordering, shipping, returns, payments, and more."
-        backgroundImage="/zenvira-page-hero-1.png"
+        backgroundImage="/logo.png"
       />
 
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 -mt-16 relative z-20 pb-8">

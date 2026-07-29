@@ -1,34 +1,76 @@
-# Storefront (Next.js)
+# Sika Homes — Storefront (Plain Postgres)
 
-E-commerce storefront with admin, payments, and notifications. Configure branding and contact details via environment variables and the CMS.
+Next.js e-commerce storefront + admin on **plain Postgres** (no Supabase runtime). Branding and credentials are configured via environment variables.
 
-## Setup
+## Technology stack
 
-1. Copy `.env.example` to `.env.local` and fill in all values.
-2. Install dependencies: `npm install`
-3. Run dev server: `npm run dev` (default port `3001`)
+- Next.js 15 (App Router), React 19, TypeScript, Tailwind CSS
+- Postgres via `pg` (`DATABASE_URL`)
+- JWT session cookies (`AUTH_SECRET`, `jose`, `bcryptjs`)
+- Disk uploads (`UPLOAD_DIR` → `/uploads`)
+- Optional: Resend, Moolre, reCAPTCHA, GA
 
-## Branding (env)
+## Prerequisites
 
-Set at minimum:
+- Node.js 20+
+- Postgres (`DATABASE_URL`)
+- Optional payment/email/SMS keys
 
-- `NEXT_PUBLIC_APP_URL` — canonical site URL  
-- `NEXT_PUBLIC_SITE_NAME` — store name  
-- `NEXT_PUBLIC_SITE_TAGLINE` — short tagline  
-- `NEXT_PUBLIC_CONTACT_EMAIL` — public contact email  
-- `NEXT_PUBLIC_CONTACT_PHONE` — display phone (optional)  
-- `NEXT_PUBLIC_CONTACT_PHONE_TEL` — E.164-style for `tel:` if different from display (optional)  
-- `NEXT_PUBLIC_CONTACT_WHATSAPP` — WhatsApp digits (optional)  
-- `NEXT_PUBLIC_CONTACT_ADDRESS` — business address (optional)  
-- `NEXT_PUBLIC_SMS_SENDER_ID` — SMS sender ID (e.g. registered with your SMS provider)  
-- `NEXT_PUBLIC_SKU_PREFIX` — auto-SKU prefix for new products  
+## Installation
 
-Admin email and Resend: `ADMIN_EMAIL`, `EMAIL_FROM`, `RESEND_API_KEY`.
+```bash
+npm install
+cp .env.example .env.local
+# Set DATABASE_URL, AUTH_SECRET, NEXT_PUBLIC_APP_URL, upload paths
+npm run db:migrate
+npm run create-admin -- you@example.com 'strong-password'
+npm run dev
+```
 
-## Stack
+Dev server: `http://localhost:3001`
 
-Next.js, Supabase, Tailwind CSS. See `package.json` for scripts.
+## Environment
 
-## License
+See [`.env.example`](.env.example). Critical vars:
 
-Replace this section with your own license terms when you publish the project.
+| Variable | Purpose |
+|----------|---------|
+| `DATABASE_URL` | Postgres connection |
+| `AUTH_SECRET` | Session signing |
+| `NEXT_PUBLIC_APP_URL` | Canonical URL |
+| `UPLOAD_DIR` | Local/VPS upload directory |
+| `NEXT_PUBLIC_UPLOAD_BASE_URL` | Public URL prefix for uploads |
+
+## Database
+
+```bash
+npm run db:migrate          # applies db/migrations/*.sql
+npm run create-admin -- <email> <password>
+```
+
+VPS (big-vps): database `store_sikahomes` via `sudo fleet db provision sikahomes`. Secrets live under `/data/fleet/secrets/store_sikahomes.env` — never commit them.
+
+## Build / deploy
+
+```bash
+npm run build
+npm start                   # port 3000
+```
+
+Docker / nginx stubs: `Dockerfile`, `docker-compose.yml`, `deploy/nginx/sikahomes.conf`.
+
+Coolify app must be created in the UI (`sikahomes-staging` / `sikahomes-app`), then:
+
+```bash
+sudo fleet deploy sikahomes-staging
+```
+
+## Docs
+
+- [`docs/SUPABASE_TO_POSTGRES_MIGRATION_GUIDE.md`](docs/SUPABASE_TO_POSTGRES_MIGRATION_GUIDE.md)
+- [`docs/STORE_HARDENING_PLAYBOOK.md`](docs/STORE_HARDENING_PLAYBOOK.md)
+
+## Architecture
+
+Browser → Next.js `/api/*` → `lib/db` (`pg`) → Postgres  
+Auth: HttpOnly JWT cookie · Files: disk under `UPLOAD_DIR`

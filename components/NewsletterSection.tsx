@@ -49,7 +49,7 @@ export default function NewsletterSection() {
             </h3>
 
             <p className="text-blue-100/80 text-base leading-relaxed">
-              Be the first to know about new arrivals, restocks, and exclusive perfume deals. We keep you updated on the latest fragrances.
+              Be the first to know about new arrivals, restocks, and exclusive offers. Replace this copy with your own newsletter message.
             </p>
           </div>
 

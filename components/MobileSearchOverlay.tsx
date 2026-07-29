@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import Link from 'next/link';
 
 interface MobileSearchOverlayProps {
   isOpen: boolean;
@@ -10,27 +9,9 @@ interface MobileSearchOverlayProps {
 
 export default function MobileSearchOverlay({ isOpen, onClose }: MobileSearchOverlayProps) {
   const [searchQuery, setSearchQuery] = useState('');
-  const [recentSearches, setRecentSearches] = useState([
-    'Summer Dress',
-    'Running Shoes',
-    'Leather Bag',
-    'Sunglasses'
-  ]);
+  const [recentSearches, setRecentSearches] = useState<string[]>([]);
 
-  const popularSearches = [
-    'New Arrivals',
-    'Sale Items',
-    'Dresses',
-    'Men\'s Shoes',
-    'Electronics',
-    'Bags & Purses'
-  ];
-
-  const searchSuggestions = [
-    { name: 'Summer Floral Dress', category: 'Women\'s Clothing', price: 'GH₵289', image: 'https://readdy.ai/api/search-image?query=elegant%20summer%20floral%20dress%20on%20white%20mannequin%20with%20simple%20clean%20white%20studio%20background%20soft%20natural%20lighting%20feminine%20style%20fashion%20photography%20high%20quality%20detailed&width=80&height=80&seq=mob1&orientation=squarish' },
-    { name: 'Classic Leather Handbag', category: 'Bags', price: 'GH₵459', image: 'https://readdy.ai/api/search-image?query=luxury%20brown%20leather%20handbag%20on%20white%20surface%20clean%20minimalist%20white%20studio%20background%20professional%20product%20photography%20high%20quality%20detailed%20premium%20fashion&width=80&height=80&seq=mob2&orientation=squarish' },
-    { name: 'Designer Sunglasses', category: 'Accessories', price: 'GH₵199', image: 'https://readdy.ai/api/search-image?query=stylish%20modern%20sunglasses%20on%20white%20display%20stand%20clean%20white%20studio%20background%20professional%20product%20photography%20high%20quality%20detailed%20fashion%20accessory&width=80&height=80&seq=mob3&orientation=squarish' }
-  ];
+  const popularSearches: string[] = [];
 
   useEffect(() => {
     if (isOpen) {
@@ -86,7 +67,7 @@ export default function MobileSearchOverlay({ isOpen, onClose }: MobileSearchOve
               <div>
                 <div className="flex items-center justify-between mb-3">
                   <h3 className="text-sm font-semibold text-gray-900">Recent Searches</h3>
-                  <button 
+                  <button
                     onClick={() => setRecentSearches([])}
                     className="text-xs text-blue-700 font-medium whitespace-nowrap"
                   >
@@ -114,46 +95,37 @@ export default function MobileSearchOverlay({ isOpen, onClose }: MobileSearchOve
               </div>
             )}
 
-            <div>
-              <h3 className="text-sm font-semibold text-gray-900 mb-3">Popular Searches</h3>
-              <div className="flex flex-wrap gap-2">
-                {popularSearches.map((search, index) => (
-                  <button
-                    key={index}
-                    className="px-4 py-2 bg-gray-100 text-gray-700 text-sm rounded-full hover:bg-blue-50 hover:text-blue-700 transition-colors whitespace-nowrap"
-                  >
-                    {search}
-                  </button>
-                ))}
+            {popularSearches.length > 0 && (
+              <div>
+                <h3 className="text-sm font-semibold text-gray-900 mb-3">Popular Searches</h3>
+                <div className="flex flex-wrap gap-2">
+                  {popularSearches.map((search, index) => (
+                    <button
+                      key={index}
+                      className="px-4 py-2 bg-gray-100 text-gray-700 text-sm rounded-full hover:bg-blue-50 hover:text-blue-700 transition-colors whitespace-nowrap"
+                    >
+                      {search}
+                    </button>
+                  ))}
+                </div>
               </div>
-            </div>
+            )}
+
+            {recentSearches.length === 0 && popularSearches.length === 0 && (
+              <div className="py-12 text-center">
+                <i className="ri-search-line text-4xl text-gray-300 mb-3"></i>
+                <p className="text-gray-500 font-medium">Search your catalog</p>
+                <p className="text-sm text-gray-400 mt-1">Suggestions appear when products are available</p>
+              </div>
+            )}
           </>
         )}
 
         {searchQuery && (
-          <div>
-            <h3 className="text-sm font-semibold text-gray-900 mb-3">Suggestions</h3>
-            <div className="space-y-3">
-              {searchSuggestions.map((product, index) => (
-                <Link
-                  key={index}
-                  href={`/product/${index + 1}`}
-                  className="flex items-center space-x-3 p-2 hover:bg-gray-50 rounded-lg transition-colors"
-                  onClick={onClose}
-                >
-                  <img
-                    src={product.image}
-                    alt={product.name}
-                    className="w-16 h-16 object-cover rounded-lg"
-                  />
-                  <div className="flex-1 min-w-0">
-                    <h4 className="text-sm font-medium text-gray-900 truncate">{product.name}</h4>
-                    <p className="text-xs text-gray-500 mt-0.5">{product.category}</p>
-                    <p className="text-sm font-semibold text-blue-700 mt-1">{product.price}</p>
-                  </div>
-                </Link>
-              ))}
-            </div>
+          <div className="py-12 text-center">
+            <i className="ri-search-line text-4xl text-gray-300 mb-3"></i>
+            <p className="text-gray-500 font-medium">No suggestions yet</p>
+            <p className="text-sm text-gray-400 mt-1">Add products to enable search results</p>
           </div>
         )}
       </div>

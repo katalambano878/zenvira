@@ -4,28 +4,11 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
-const mockOrders = [
-  {
-    id: 'ORD-EXAMPLE-001',
-    date: '2024-01-20',
-    items: [
-      {
-        id: 1,
-        name: 'Premium Leather Crossbody Bag',
-        price: 289,
-        image: 'https://readdy.ai/api/search-image?query=elegant%20premium%20leather%20crossbody%20bag%20in%20deep%20forest%20green%20color%20on%20clean%20minimal%20white%20studio%20background%20with%20soft%20natural%20lighting%20showcasing%20luxury%20craftsmanship&width=400&height=400&seq=return1&orientation=squarish',
-        returnable: true
-      },
-      {
-        id: 2,
-        name: 'Minimalist Ceramic Vase Set',
-        price: 159,
-        image: 'https://readdy.ai/api/search-image?query=modern%20minimalist%20ceramic%20vase%20set%20in%20matte%20cream%20and%20charcoal%20colors%20on%20pristine%20white%20background%20elegant%20home%20decor%20sophisticated%20styling&width=400&height=400&seq=return2&orientation=squarish',
-        returnable: true
-      }
-    ]
-  }
-];
+const mockOrders: Array<{
+  id: string;
+  date: string;
+  items: Array<{ id: number; name: string; price: number; image: string; returnable: boolean }>;
+}> = [];
 
 export default function ReturnsPortalPage() {
   const router = useRouter();
@@ -53,9 +36,12 @@ export default function ReturnsPortalPage() {
     e.preventDefault();
     setIsLoading(true);
     setTimeout(() => {
-      setFoundOrder(mockOrders[0]);
+      const order = mockOrders[0] ?? null;
+      setFoundOrder(order);
       setIsLoading(false);
-      setStep(2);
+      if (order) {
+        setStep(2);
+      }
     }, 1000);
   };
 

@@ -3,8 +3,10 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { supabase } from '@/lib/supabase';
+import Image from 'next/image';
+import { api } from '@/lib/api';
 import { useRecaptcha } from '@/hooks/useRecaptcha';
+import { getWordmark, getSiteName } from '@/lib/site-defaults';
 
 export default function AdminLoginPage() {
   const router = useRouter();
@@ -21,31 +23,25 @@ export default function AdminLoginPage() {
     setIsLoading(true);
 
     // reCAPTCHA verification
-    const isHuman = (await getToken('admin_login')).ok;
-    if (!isHuman) {
+    const recaptcha = await getToken('admin_login');
+    if (!recaptcha.ok) {
       setError('Security verification failed. Please try again.');
       setIsLoading(false);
       return;
     }
 
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password
-      });
-
-      if (error) throw error;
-
-      if (data.session) {
-        // Set auth cookie so middleware can verify the session server-side
-        document.cookie = `sb-access-token=${data.session.access_token}; path=/; max-age=${60 * 60 * 24 * 7}; SameSite=Lax; Secure`;
-        document.cookie = `sb-refresh-token=${data.session.refresh_token}; path=/; max-age=${60 * 60 * 24 * 30}; SameSite=Lax; Secure`;
-
-        router.push('/admin');
-        router.refresh();
+      await api('/api/auth/login', { method: 'POST', json: { email, password } });
+      const me = await api<{ user: { role: string } }>('/api/auth/me');
+      const role = me.user?.role;
+      if (role !== 'admin' && role !== 'staff') {
+        await api('/api/auth/logout', { method: 'POST' }).catch(() => {});
+        throw new Error('You do not have permission to access the admin area.');
       }
-    } catch (err: any) {
-      setError(err.message || 'Login failed');
+      router.push('/admin');
+      router.refresh();
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Login failed');
     } finally {
       setIsLoading(false);
     }
@@ -56,7 +52,8 @@ export default function AdminLoginPage() {
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <Link href="/" className="inline-block">
-            <p className="font-['Pacifico'] text-4xl text-blue-700 text-center">{process.env.NEXT_PUBLIC_WORDMARK || 'Zenvira'}</p>
+            <Image src="/logo.png" alt={getSiteName()} width={64} height={64} className="mx-auto mb-4 object-contain" />
+            <p className="font-['Pacifico'] text-4xl text-blue-700 text-center">{getWordmark()}</p>
           </Link>
           <h1 className="text-3xl font-bold text-gray-900 mt-6 mb-2">Admin Login</h1>
           <p className="text-gray-600">Sign in to access the admin dashboard</p>

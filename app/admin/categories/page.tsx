@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { supabase } from '@/lib/supabase';
+import { api } from '@/lib/api';
 
 export default function AdminCategoriesPage() {
   const [showAddModal, setShowAddModal] = useState(false);
@@ -32,12 +32,7 @@ export default function AdminCategoriesPage() {
   const fetchCategories = async () => {
     try {
       setLoading(true);
-      const { data, error } = await supabase
-        .from('categories')
-        .select('*')
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
+      const data = await api<any[]>('/api/catalog/categories');
       if (data) setCategories(data);
     } catch (err) {
       console.error('Error fetching categories:', err);
@@ -63,9 +58,7 @@ export default function AdminCategoriesPage() {
   const handleDelete = async (categoryId: string) => {
     if (!confirm('Are you sure you want to delete this category? Products in it will have no category.')) return;
     try {
-      await supabase.from('products').update({ category_id: null }).eq('category_id', categoryId);
-      const { error } = await supabase.from('categories').delete().eq('id', categoryId);
-      if (error) throw error;
+      await api(`/api/catalog/categories/${categoryId}`, { method: 'DELETE' });
       setCategories(categories.filter((c) => c.id !== categoryId));
       alert('Category deleted successfully');
     } catch (err: any) {
@@ -84,17 +77,12 @@ export default function AdminCategoriesPage() {
       const filePath = `${fileName}`;
 
       // Upload to 'products' bucket for simplicity, or create a 'categories' bucket
-      const { error: uploadError } = await supabase.storage
-        .from('products')
-        .upload(filePath, file);
-
-      if (uploadError) throw uploadError;
-
-      const { data: { publicUrl } } = supabase.storage
-        .from('products')
-        .getPublicUrl(filePath);
-
-      setFormData({ ...formData, image_url: publicUrl });
+      const form = new FormData();
+      form.append('file', file);
+      const uploaded = await fetch('/api/uploads', { method: 'POST', body: form, credentials: 'include' }).then(
+        (r) => (r.ok ? r.json() : Promise.reject(new Error('Upload failed')))
+      );
+      setFormData({ ...formData, image_url: uploaded.url });
 
     } catch (error: any) {
       alert('Error uploading image: ' + error.message);
@@ -124,17 +112,10 @@ export default function AdminCategoriesPage() {
       };
 
       if (showEditModal && editingCategory) {
-        const { error } = await supabase
-          .from('categories')
-          .update(payload)
-          .eq('id', editingCategory.id);
-        if (error) throw error;
+        await api(`/api/catalog/categories/${editingCategory.id}`, { method: 'PATCH', json: payload });
         alert('Category updated');
       } else {
-        const { error } = await supabase
-          .from('categories')
-          .insert([payload]);
-        if (error) throw error;
+        await api('/api/catalog/categories', { method: 'POST', json: payload });
         alert('Category created');
       }
 
@@ -157,7 +138,7 @@ export default function AdminCategoriesPage() {
     if (showAddModal && formData.name && !editingCategory) {
       setFormData(prev => ({
         ...prev,
-        slug: prev.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '')
+        slug: (prev.name || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '')
       }));
     }
   }, [formData.name, showAddModal, editingCategory]);
@@ -168,9 +149,7 @@ export default function AdminCategoriesPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">Categories</h1>
-          <p className="text-gray-600 mt-1">
-            Organize products into categories. <strong>Featured</strong> + image = shown on the store homepage grid.
-          </p>
+          <p className="text-gray-600 mt-1">Organize your products into categories</p>
         </div>
         <button
           onClick={() => {
@@ -178,7 +157,7 @@ export default function AdminCategoriesPage() {
             setFormData({ name: '', slug: '', description: '', image_url: '', parent_id: '', featured: false, status: 'active' });
             setShowAddModal(true);
           }}
-          className="bg-blue-700 hover:bg-blue-800 text-white px-6 py-3 rounded-lg font-semibold transition-colors whitespace-nowrap cursor-pointer"
+          className="bg-store-navy hover:bg-store-navy text-white px-6 py-3 rounded-lg font-semibold transition-colors whitespace-nowrap cursor-pointer"
         >
           <i className="ri-add-line mr-2"></i>
           Add Category
@@ -192,11 +171,11 @@ export default function AdminCategoriesPage() {
         </div>
         <div className="bg-white rounded-xl border-2 border-gray-200 p-4">
           <p className="text-sm text-gray-600 mb-1">Active</p>
-          <p className="text-2xl font-bold text-blue-700">{categories.filter(c => c.status === 'active').length}</p>
+          <p className="text-2xl font-bold text-store-ink">{categories.filter(c => c.status === 'active').length}</p>
         </div>
         <div className="bg-white rounded-xl border-2 border-gray-200 p-4">
           <p className="text-sm text-gray-600 mb-1">Featured</p>
-          <p className="text-2xl font-bold text-blue-700">{categories.filter(c => c.metadata?.featured).length}</p>
+          <p className="text-2xl font-bold text-store-ink">{categories.filter(c => c.metadata?.featured).length}</p>
         </div>
       </div>
 
@@ -240,14 +219,14 @@ export default function AdminCategoriesPage() {
                       {categories.find(c => c.id === category.parent_id)?.name || '-'}
                     </td>
                     <td className="py-4 px-4">
-                      <span className={`px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap capitalize ${category.status === 'active' ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-600'
+                      <span className={`px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap capitalize ${category.status === 'active' ? 'bg-store-surface text-store-ink' : 'bg-gray-100 text-gray-600'
                         }`}>
                         {category.status}
                       </span>
                     </td>
                     <td className="py-4 px-4">
                       {category.metadata?.featured ? (
-                        <span className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-semibold whitespace-nowrap">
+                        <span className="px-3 py-1 bg-store-surface text-store-ink rounded-full text-xs font-semibold whitespace-nowrap">
                           Featured
                         </span>
                       ) : (
@@ -258,7 +237,7 @@ export default function AdminCategoriesPage() {
                       <div className="flex items-center space-x-2">
                         <button
                           onClick={() => handleEdit(category)}
-                          className="w-8 h-8 flex items-center justify-center text-gray-600 hover:text-blue-700 hover:bg-blue-50 rounded-lg transition-colors cursor-pointer"
+                          className="w-8 h-8 flex items-center justify-center text-gray-600 hover:text-store-ink hover:bg-store-surface rounded-lg transition-colors cursor-pointer"
                         >
                           <i className="ri-edit-line text-lg w-4 h-4 flex items-center justify-center"></i>
                         </button>
@@ -307,7 +286,7 @@ export default function AdminCategoriesPage() {
                     type="text"
                     value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-store-primary focus:border-store-primary"
                     placeholder="Enter category name"
                   />
                 </div>
@@ -319,7 +298,7 @@ export default function AdminCategoriesPage() {
                   <select
                     value={formData.parent_id || ''}
                     onChange={(e) => setFormData({ ...formData, parent_id: e.target.value || null })}
-                    className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-store-primary focus:border-store-primary"
                   >
                     <option value="">None (Top Level)</option>
                     {categories
@@ -340,7 +319,7 @@ export default function AdminCategoriesPage() {
                   type="text"
                   value={formData.slug}
                   onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
-                  className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-store-primary focus:border-store-primary"
                   placeholder="category-url-slug"
                 />
               </div>
@@ -354,7 +333,7 @@ export default function AdminCategoriesPage() {
                   maxLength={500}
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"
+                  className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-store-primary focus:border-store-primary resize-none"
                   placeholder="Brief description of this category..."
                 />
               </div>
@@ -363,10 +342,10 @@ export default function AdminCategoriesPage() {
                 <label className="block text-sm font-semibold text-gray-900 mb-2">
                   Category Image
                 </label>
-                <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-blue-700 hover:bg-blue-50 transition-colors relative">
+                <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-store-navy hover:bg-store-surface transition-colors relative">
                   {uploading ? (
                     <div className="flex flex-col items-center">
-                      <i className="ri-loader-4-line animate-spin text-3xl mb-2 text-blue-700"></i>
+                      <i className="ri-loader-4-line animate-spin text-3xl mb-2 text-store-ink"></i>
                       <span className="text-sm font-medium text-gray-600">Uploading...</span>
                     </div>
                   ) : formData.image_url ? (
@@ -396,7 +375,7 @@ export default function AdminCategoriesPage() {
                   <select
                     value={formData.status}
                     onChange={(e) => setFormData({ ...formData, status: e.target.value })}
-                    className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 cursor-pointer"
+                    className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-store-primary focus:border-store-primary cursor-pointer"
                   >
                     <option value="active">Active</option>
                     <option value="inactive">Inactive</option>
@@ -407,7 +386,7 @@ export default function AdminCategoriesPage() {
                     type="checkbox"
                     checked={formData.featured}
                     onChange={(e) => setFormData({ ...formData, featured: e.target.checked })}
-                    className="w-5 h-5 text-blue-700 border-gray-300 rounded focus:ring-blue-500 cursor-pointer"
+                    className="w-5 h-5 text-store-ink border-gray-300 rounded focus:ring-store-primary cursor-pointer"
                   />
                   <label className="text-gray-900 font-medium">
                     Feature on homepage
@@ -432,7 +411,7 @@ export default function AdminCategoriesPage() {
               <button
                 onClick={handleSubmit}
                 disabled={saving || uploading}
-                className={`px-6 py-3 bg-blue-700 hover:bg-blue-800 text-white rounded-lg font-semibold transition-colors whitespace-nowrap cursor-pointer flex items-center ${saving ? 'opacity-70' : ''}`}
+                className={`px-6 py-3 bg-store-navy hover:bg-store-navy text-white rounded-lg font-semibold transition-colors whitespace-nowrap cursor-pointer flex items-center ${saving ? 'opacity-70' : ''}`}
               >
                 {saving && <i className="ri-loader-4-line animate-spin mr-2"></i>}
                 {showAddModal ? 'Add Category' : 'Save Changes'}

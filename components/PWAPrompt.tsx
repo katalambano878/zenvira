@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { usePWAInstall } from './PWAInstaller';
+import { getSiteName, getSiteTagline } from '@/lib/site-defaults';
 
 export default function PWAPrompt() {
   const [showPrompt, setShowPrompt] = useState(false);
@@ -53,14 +54,12 @@ export default function PWAPrompt() {
           <div className="px-6 pb-8">
             {/* App icon and info */}
             <div className="flex items-center gap-4 mb-6">
-              <div className="w-16 h-16 rounded-2xl shadow-lg flex-shrink-0 bg-blue-700 flex items-center justify-center">
-                <span className="font-['Pacifico'] text-2xl text-white leading-none">
-                  {process.env.NEXT_PUBLIC_WORDMARK || 'Zenvira'}
-                </span>
+              <div className="w-16 h-16 rounded-2xl shadow-lg flex-shrink-0 bg-blue-700 flex items-center justify-center overflow-hidden">
+                <img src="/logo.png" alt="" className="w-12 h-12 object-contain" />
               </div>
               <div className="flex-1 min-w-0">
-                <h3 className="font-bold text-gray-900 text-lg truncate">{process.env.NEXT_PUBLIC_WORDMARK || 'Zenvira'}</h3>
-                <p className="text-sm text-gray-500">{process.env.NEXT_PUBLIC_SITE_TAGLINE || 'Add to home screen'}</p>
+                <h3 className="font-bold text-gray-900 text-lg truncate">{getSiteName()}</h3>
+                <p className="text-sm text-gray-500">{getSiteTagline()}</p>
                 <div className="flex items-center gap-1 mt-1">
                   {[1, 2, 3, 4, 5].map((star) => (
                     <i key={star} className="ri-star-fill text-amber-400 text-xs" />

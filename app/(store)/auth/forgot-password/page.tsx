@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useState } from 'react';
+import { api } from '@/lib/api';
 import { useRecaptcha } from '@/hooks/useRecaptcha';
 
 export default function ForgotPasswordPage() {
@@ -35,10 +36,17 @@ export default function ForgotPasswordPage() {
       return;
     }
 
-    setTimeout(() => {
-      setIsLoading(false);
+    try {
+      await api('/api/auth/forgot-password', {
+        method: 'POST',
+        json: { email },
+      });
       setIsSubmitted(true);
-    }, 1500);
+    } catch {
+      setError('Unable to send reset email. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   if (isSubmitted) {

@@ -6,43 +6,42 @@ import PageHero from '@/components/PageHero';
 import { usePageTitle } from '@/hooks/usePageTitle';
 
 export default function AboutPage() {
-  usePageTitle('Our Story');
+  usePageTitle('About');
   const { getSetting } = useCMS();
 
-  const siteName = getSetting('site_name') || process.env.NEXT_PUBLIC_SITE_NAME || 'Your Store';
+  const siteName = getSetting('site_name') || process.env.NEXT_PUBLIC_SITE_NAME || 'New Project';
 
   const values = [
     {
       icon: 'ri-verified-badge-line',
-      title: 'Verified Quality',
-      description: 'We focus on products you can trust — carefully sourced and checked before they reach you.'
+      title: 'Quality First',
+      description: 'Products you can trust — selected and checked before they reach you.'
     },
     {
-      icon: 'ri-money-dollar-circle-line',
-      title: 'Fair Prices',
-      description: 'Competitive wholesale and retail pricing for resellers and individual customers.'
+      icon: 'ri-shopping-bag-line',
+      title: 'Simple Shopping',
+      description: 'Browse, add to cart, and checkout with a straightforward online experience.'
     },
     {
-      icon: 'ri-global-line',
-      title: 'Curated Selection',
-      description: 'A handpicked catalogue updated regularly so you find what you need.'
+      icon: 'ri-customer-service-2-line',
+      title: 'Helpful Support',
+      description: 'Questions about an order? Reach us through the Contact page.'
     },
     {
       icon: 'ri-truck-line',
-      title: 'Reliable Delivery',
-      description: 'Fast fulfilment where we operate — see Shipping for zones and timeframes.'
+      title: 'Flexible Delivery',
+      description: 'Pickup and delivery options at checkout — see Shipping for details.'
     }
   ];
 
   return (
     <div className="min-h-screen bg-white">
       <PageHero
-        title="More Than Just A Brand"
-        subtitle={`${siteName} — quality products, wholesale and retail.`}
-        backgroundImage="/zenvira-page-hero-1.png"
+        title="About Us"
+        subtitle={`${siteName} — a clean starting point for your online store.`}
+        backgroundImage="/logo.png"
       />
 
-      {/* Who We Are - Hero section */}
       <section className="py-20 bg-white overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
@@ -50,23 +49,20 @@ export default function AboutPage() {
               <h2 className="text-3xl md:text-4xl font-serif text-gray-900 mb-6">Who We Are</h2>
               <div className="space-y-4 text-lg text-gray-600 leading-relaxed">
                 <p>
-                  At <strong>{siteName}</strong>, we believe great products should be easy to buy online. We offer retail and wholesale options with a focus on quality and service.
+                  <strong>{siteName}</strong> is an e-commerce starter built to launch quickly. Customize branding, products, and settings in the admin, then go live when you are ready.
                 </p>
                 <p>
-                  We&apos;ve built a reputation for quality, trust, and service. Products are sourced with care so you can shop with confidence.
+                  This template includes storefront pages, checkout, order tracking, and admin tools — everything you need as a foundation for a new project.
                 </p>
                 <p>
-                  Whether you shop online or pick up locally, we aim for a smooth experience — delivery options and timelines are listed on our Shipping page.
-                </p>
-                <p>
-                  Our goal is straightforward: great products, clear communication, and support when you need it.
+                  Replace placeholder content, connect your payment provider, and add your catalog to make the store yours.
                 </p>
               </div>
             </div>
             <div className="relative">
               <div className="aspect-[4/3] rounded-2xl overflow-hidden shadow-2xl relative bg-gray-100 flex items-center justify-center">
                 <img
-                  src="/neww.png"
+                  src="/logo.png"
                   alt={siteName}
                   className="w-full h-full object-contain p-8"
                 />
@@ -76,35 +72,13 @@ export default function AboutPage() {
         </div>
       </section>
 
-      <div id="our-story" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
-        <div className="grid md:grid-cols-2 gap-12 animate-in fade-in slide-in-from-bottom-4 duration-500">
-            <div className="bg-blue-50 p-10 rounded-3xl border border-blue-100">
-              <div className="w-16 h-16 bg-blue-700 rounded-2xl flex items-center justify-center mb-8 shadow-lg">
-                <i className="ri-store-2-line text-3xl text-white"></i>
-              </div>
-              <h3 className="text-3xl font-bold text-gray-900 mb-4">Everything in One Place</h3>
-              <p className="text-gray-600 text-lg leading-relaxed">
-                Our catalogue spans the categories we carry — updated regularly with new arrivals for wholesale and retail customers.
-              </p>
-            </div>
-            <div className="bg-amber-50 p-10 rounded-3xl border border-amber-100">
-              <div className="w-16 h-16 bg-amber-600 rounded-2xl flex items-center justify-center mb-8 shadow-lg">
-                <i className="ri-hand-heart-line text-3xl text-white"></i>
-              </div>
-              <h3 className="text-3xl font-bold text-gray-900 mb-4">Empowering Resellers</h3>
-              <p className="text-gray-600 text-lg leading-relaxed">
-                We support small businesses and resellers with competitive bulk pricing and wholesale options where available.
-              </p>
-            </div>
-          </div>
-      </div>
-
-      {/* Values Section */}
       <div className="bg-gray-50 py-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">Why Shop With Us?</h2>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">Trusted by customers and resellers who value quality and service.</p>
+            <h2 className="text-4xl font-bold text-gray-900 mb-4">What You Get</h2>
+            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+              A neutral storefront foundation — customize it for your brand and products.
+            </p>
           </div>
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
             {values.map((value, index) => (
@@ -120,18 +94,17 @@ export default function AboutPage() {
         </div>
       </div>
 
-      {/* CTA */}
       <div className="bg-blue-900 py-24">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-white">
-          <h2 className="text-4xl md:text-5xl font-bold mb-8">Ready to find your signature scent?</h2>
+          <h2 className="text-4xl md:text-5xl font-bold mb-8">Ready to explore?</h2>
           <p className="text-xl text-blue-100 mb-10 leading-relaxed max-w-2xl mx-auto">
-            Browse our catalog — wholesale and retail. See our Contact page for phone, email, and location.
+            Browse the shop or visit Contact for email, phone, and location details.
           </p>
           <Link
             href="/shop"
             className="inline-flex items-center gap-3 bg-white text-blue-900 px-10 py-5 rounded-full font-bold text-lg hover:bg-blue-50 transition-colors shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all"
           >
-            Start Shopping
+            Visit Shop
             <i className="ri-arrow-right-line"></i>
           </Link>
         </div>

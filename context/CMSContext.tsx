@@ -1,7 +1,34 @@
 'use client';
 
-import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { supabase } from '@/lib/supabase';
+import { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react';
+
+const PUBLIC_SETTINGS_KEYS = [
+    'site_name',
+    'site_tagline',
+    'site_logo',
+    'contact_email',
+    'contact_phone',
+    'contact_phone_secondary',
+    'contact_whatsapp',
+    'contact_address',
+    'social_facebook',
+    'social_instagram',
+    'social_twitter',
+    'social_tiktok',
+    'social_snapchat',
+    'social_youtube',
+    'primary_color',
+    'secondary_color',
+    'currency',
+    'currency_symbol',
+] as const;
+
+function settingValueToString(value: unknown): string {
+  if (value == null) return '';
+  if (typeof value === 'string') return value;
+  if (typeof value === 'number' || typeof value === 'boolean') return String(value);
+  return '';
+}
 
 interface SiteSettings {
     site_name: string;
@@ -67,11 +94,11 @@ interface CMSContextType {
 }
 
 const defaultSettings: SiteSettings = {
-    site_name: process.env.NEXT_PUBLIC_SITE_NAME || 'Your Store',
-    site_tagline: process.env.NEXT_PUBLIC_SITE_TAGLINE || 'Online store — retail & wholesale.',
-    site_logo: '/neww.png',
-    contact_email: process.env.NEXT_PUBLIC_CONTACT_EMAIL || 'contact@example.com',
-    contact_phone: process.env.NEXT_PUBLIC_CONTACT_PHONE || '',
+    site_name: process.env.NEXT_PUBLIC_SITE_NAME || 'New Project',
+    site_tagline: process.env.NEXT_PUBLIC_SITE_TAGLINE || 'Build something exceptional.',
+    site_logo: '/logo.png',
+    contact_email: process.env.NEXT_PUBLIC_CONTACT_EMAIL || 'hello@example.com',
+    contact_phone: process.env.NEXT_PUBLIC_CONTACT_PHONE || '+1 000 000 0000',
     contact_whatsapp: process.env.NEXT_PUBLIC_CONTACT_WHATSAPP || process.env.NEXT_PUBLIC_CONTACT_PHONE || '',
     contact_address: process.env.NEXT_PUBLIC_CONTACT_ADDRESS || '',
     social_facebook: '',
@@ -80,8 +107,8 @@ const defaultSettings: SiteSettings = {
     social_tiktok: '',
     social_snapchat: '',
     social_youtube: '',
-    primary_color: '#059669',
-    secondary_color: '#0D9488',
+    primary_color: '#2563eb',
+    secondary_color: '#64748b',
     currency: 'GHS',
     currency_symbol: 'GH₵',
 };
@@ -98,35 +125,38 @@ const CMSContext = createContext<CMSContextType>({
 });
 
 export function CMSProvider({ children }: { children: ReactNode }) {
-    const [settings, setSettings] = useState<SiteSettings>({
-        site_name: process.env.NEXT_PUBLIC_SITE_NAME || 'Your Store',
-        site_tagline: process.env.NEXT_PUBLIC_SITE_TAGLINE || 'Online store — retail & wholesale.',
-        site_logo: '/neww.png',
-        contact_email: process.env.NEXT_PUBLIC_CONTACT_EMAIL || 'contact@example.com',
-        contact_phone: process.env.NEXT_PUBLIC_CONTACT_PHONE || '',
-        contact_whatsapp: process.env.NEXT_PUBLIC_CONTACT_WHATSAPP || process.env.NEXT_PUBLIC_CONTACT_PHONE || '',
-        contact_address: process.env.NEXT_PUBLIC_CONTACT_ADDRESS || '',
-        social_facebook: '',
-        social_instagram: '',
-        social_twitter: '',
-        social_tiktok: '',
-        social_snapchat: '',
-        social_youtube: '',
-        primary_color: '#2563eb',
-        secondary_color: '#FBF6F2',
-        currency: 'GHS',
-        currency_symbol: 'GH₵',
-    });
+    const [settings, setSettings] = useState<SiteSettings>(defaultSettings);
     const [content, setContent] = useState<CMSContent[]>([]);
     const [banners, setBanners] = useState<Banner[]>([]);
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState(true);
 
-    // CMS Fetching Logic Removed - Content is now managed in code.
-    const fetchCMSData = async () => { };
-
-    // Initial load handled by state defaults
-    useEffect(() => {
+    const fetchCMSData = useCallback(async () => {
+        setLoading(true);
+        try {
+            const keys = PUBLIC_SETTINGS_KEYS.join(',');
+            const res = await fetch(`/api/settings?keys=${encodeURIComponent(keys)}`);
+            if (!res.ok) return;
+            const data = (await res.json()) as { settings?: Record<string, unknown> };
+            const raw = data.settings ?? {};
+            setSettings((prev) => {
+                const next = { ...prev };
+                for (const key of PUBLIC_SETTINGS_KEYS) {
+                    if (key in raw) {
+                        next[key] = settingValueToString(raw[key]);
+                    }
+                }
+                return next;
+            });
+        } catch (err) {
+            console.warn('[CMS] settings fetch failed', err);
+        } finally {
+            setLoading(false);
+        }
     }, []);
+
+    useEffect(() => {
+        fetchCMSData();
+    }, [fetchCMSData]);
 
     const getContent = (section: string, blockKey: string): CMSContent | undefined => {
         return content.find(c => c.section === section && c.block_key === blockKey);

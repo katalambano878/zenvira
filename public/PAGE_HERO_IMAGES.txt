@@ -1,9 +1,0 @@
-Page hero backgrounds (home page uses its own slider — unchanged):
-
-  zenvira-page-hero-1.png  — marble / stones product shot
-  zenvira-page-hero-2.png  — wooden-surface variant (if this matches hero-1, copy your 2nd image over this file; Windows long paths can block automated copy)
-  zenvira-page-hero-3.png  — garden / Japanese-garden style
-  zenvira-page-hero-4.png  — sunset / landscape
-  zenvira-page-hero-5.png  — beach / tropical
-
-Used on: About, Shop, Wishlist, Shipping, Contact, Categories, Cart, Blog, FAQs, Help, Privacy, Terms, plus blog post cards.

@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import CheckoutSteps from '@/components/CheckoutSteps';
 import OrderSummary from '@/components/OrderSummary';
 import { useCart } from '@/context/CartContext';
-import { supabase } from '@/lib/supabase';
+import { api } from '@/lib/api';
 import { usePageTitle } from '@/hooks/usePageTitle';
 import { useRecaptcha } from '@/hooks/useRecaptcha';
 
@@ -33,26 +33,7 @@ export default function CheckoutPage() {
     region: ''
   });
 
-  // Ghana Regions for dropdown
-  const ghanaRegions = [
-    'Greater Accra',
-    'Ashanti',
-    'Western',
-    'Central',
-    'Eastern',
-    'Northern',
-    'Volta',
-    'Upper East',
-    'Upper West',
-    'Brong-Ahafo',
-    'Ahafo',
-    'Bono',
-    'Bono East',
-    'North East',
-    'Savannah',
-    'Oti',
-    'Western North'
-  ];
+  const regionOptions = ['Local', 'Metro', 'Regional', 'Nationwide'];
 
   const [deliveryMethod, setDeliveryMethod] = useState('pickup');
   const [paymentMethod, setPaymentMethod] = useState('moolre');
@@ -63,12 +44,15 @@ export default function CheckoutPage() {
   // Check auth and cart
   useEffect(() => {
     async function checkUser() {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session?.user) {
-        setUser(session.user);
-        setCheckoutType('account'); // Auto-select account checkout if logged in
-        // Pre-fill email if available
-        setShippingData(prev => ({ ...prev, email: session.user.email || '' }));
+      try {
+        const me = await api<{ user: { id: string; email: string } | null }>('/api/auth/me');
+        if (me.user) {
+          setUser(me.user);
+          setCheckoutType('account');
+          setShippingData((prev) => ({ ...prev, email: me.user!.email || '' }));
+        }
+      } catch {
+        /* guest checkout */
       }
     }
     checkUser();
@@ -143,110 +127,30 @@ export default function CheckoutPage() {
       const trackingId = Array.from({ length: 6 }, () => 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'[Math.floor(Math.random() * 32)]).join('');
       const trackingNumber = `SLI-${trackingId}`;
 
-      // 1. Create Order
-      const { data: order, error: orderError } = await supabase
-        .from('orders')
-        .insert([{
-          order_number: orderNumber,
-          user_id: user?.id || null, // Capture user_id if logged in
-          email: shippingData.email,
-          phone: shippingData.phone,
-          status: 'pending',
-          payment_status: 'pending',
-          currency: 'GHS',
-          subtotal: subtotal,
-          tax_total: tax,
-          shipping_total: shippingCost,
-          discount_total: 0,
-          total: total,
-          shipping_method: deliveryMethod,
-          payment_method: paymentMethod,
-          shipping_address: shippingData,
-          billing_address: shippingData, // Using same for now
-          metadata: {
-            guest_checkout: !user,
-            first_name: shippingData.firstName,
-            last_name: shippingData.lastName,
-            tracking_number: trackingNumber
-          }
-        }])
-        .select()
-        .single();
+      const cartPayload = cart.map((item) => ({
+        id: item.id,
+        name: item.name,
+        slug: item.slug,
+        variant: item.variant,
+        quantity: item.quantity,
+        price: item.price,
+        image: item.image,
+      }));
 
-      if (orderError) throw orderError;
-
-      // 2. Create Order Items (with UUID validation)
-      // Helper to check if string is a valid UUID
-      const isValidUUID = (str: string) => /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(str);
-      
-      // Build order items, resolving slugs to UUIDs if needed
-      const orderItems = [];
-      
-      // Batch-fetch product metadata (for preorder_shipping etc.)
-      const productIds = cart.map(item => item.id).filter(id => isValidUUID(id));
-      const { data: productsData } = productIds.length > 0
-        ? await supabase.from('products').select('id, metadata').in('id', productIds)
-        : { data: [] };
-      const productMetaMap = new Map((productsData || []).map((p: any) => [p.id, p.metadata]));
-      
-      for (const item of cart) {
-        let productId = item.id;
-        
-        // If id is not a valid UUID, it might be a slug - try to resolve it
-        if (!isValidUUID(productId)) {
-          const { data: product } = await supabase
-            .from('products')
-            .select('id, metadata')
-            .or(`slug.eq.${productId},id.eq.${productId}`)
-            .single();
-          
-          if (product) {
-            productId = product.id;
-            productMetaMap.set(product.id, product.metadata);
-          } else {
-            throw new Error(`Product not found: ${item.name}. Please remove it from your cart and try again.`);
-          }
-        }
-        
-        const prodMeta = productMetaMap.get(productId);
-        
-        orderItems.push({
-          order_id: order.id,
-          product_id: productId,
-          product_name: item.name,
-          variant_name: item.variant,
-          quantity: item.quantity,
-          unit_price: item.price,
-          total_price: item.price * item.quantity,
-          metadata: {
-            image: item.image,
-            slug: item.slug,
-            preorder_shipping: prodMeta?.preorder_shipping || null
-          }
-        });
-      }
-
-      const { error: itemsError } = await supabase
-        .from('order_items')
-        .insert(orderItems);
-
-      if (itemsError) throw itemsError;
-
-      // Note: Stock reduction happens in mark_order_paid when payment is confirmed
-
-      // 3. Upsert Customer Record (for both guest and registered users)
-      const fullName = `${shippingData.firstName} ${shippingData.lastName}`.trim();
-      await supabase.rpc('upsert_customer_from_order', {
-        p_email: shippingData.email,
-        p_phone: shippingData.phone,
-        p_full_name: fullName,
-        p_first_name: shippingData.firstName,
-        p_last_name: shippingData.lastName,
-        p_user_id: user?.id || null,
-        p_address: shippingData
+      const order = await api<Record<string, unknown>>('/api/orders', {
+        method: 'POST',
+        json: {
+          orderNumber,
+          trackingNumber,
+          shippingData,
+          deliveryMethod,
+          paymentMethod,
+          cart: cartPayload,
+          shippingCost,
+          tax,
+        },
       });
 
-      // 4. Handle Payment Redirects or Completion
       if (paymentMethod === 'moolre') {
         try {
           // Payment link reminder will be sent automatically after 15 mins if unpaid (via cron)
@@ -478,7 +382,7 @@ export default function CheckoutPage() {
                           onChange={(e) => setShippingData({ ...shippingData, city: e.target.value })}
                           className={`w-full px-4 py-3 border-2 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${errors.city ? 'border-red-500' : 'border-gray-300'
                             }`}
-                          placeholder="Accra"
+                          placeholder="City"
                         />
                         {errors.city && <p className="text-sm text-red-600 mt-1">{errors.city}</p>}
                       </div>
@@ -493,7 +397,7 @@ export default function CheckoutPage() {
                             }`}
                         >
                           <option value="">Select Region</option>
-                          {ghanaRegions.map((region) => (
+                          {regionOptions.map((region) => (
                             <option key={region} value={region}>{region}</option>
                           ))}
                         </select>
@@ -543,54 +447,54 @@ export default function CheckoutPage() {
                           className="w-5 h-5 text-blue-700"
                         />
                         <div>
-                          <p className="font-semibold text-gray-900">Store Pickup</p>
-                          <p className="text-sm text-gray-600">Pick up from our store — Ready in 24 hours</p>
+                          <p className="font-semibold text-gray-900">Pickup</p>
+                          <p className="text-sm text-gray-600">Collect from our location — ready within 24 hours</p>
                         </div>
                       </div>
                       <p className="font-bold text-blue-700">FREE</p>
                     </label>
 
-                    <label className={`flex items-center justify-between p-4 border-2 rounded-lg cursor-pointer transition-colors ${deliveryMethod === 'doorstep' ? 'border-blue-700 bg-blue-50' : 'border-gray-300 hover:border-gray-400'
+                    <label className={`flex items-center justify-between p-4 border-2 rounded-lg cursor-pointer transition-colors ${deliveryMethod === 'local' ? 'border-blue-700 bg-blue-50' : 'border-gray-300 hover:border-gray-400'
                       }`}>
                       <div className="flex items-center space-x-4">
                         <input
                           type="radio"
                           name="delivery"
-                          value="doorstep"
-                          checked={deliveryMethod === 'doorstep'}
+                          value="local"
+                          checked={deliveryMethod === 'local'}
                           onChange={(e) => setDeliveryMethod(e.target.value)}
                           className="w-5 h-5 text-blue-700"
                         />
                         <div>
-                          <p className="font-semibold text-gray-900">Doorstep Delivery</p>
-                          <p className="text-sm text-gray-600">We will contact you with the delivery cost</p>
+                          <p className="font-semibold text-gray-900">Local delivery</p>
+                          <p className="text-sm text-gray-600">Delivery to your address — cost confirmed at checkout</p>
                         </div>
                       </div>
-                      <p className="font-semibold text-amber-600 text-sm">At a Cost</p>
+                      <p className="font-semibold text-amber-600 text-sm">At a cost</p>
                     </label>
 
-                    {/* Comprehensive delivery options - to be re-enabled later
-                    <label className={`flex items-center justify-between p-4 border-2 rounded-lg cursor-pointer transition-colors ${deliveryMethod === 'accra' ? 'border-blue-700 bg-blue-50' : 'border-gray-300 hover:border-gray-400'
+                    {/* Additional delivery tiers — enable when pricing is configured
+                    <label className={`flex items-center justify-between p-4 border-2 rounded-lg cursor-pointer transition-colors ${deliveryMethod === 'local' ? 'border-blue-700 bg-blue-50' : 'border-gray-300 hover:border-gray-400'
                       }`}>
                       <div className="flex items-center space-x-4">
-                        <input type="radio" name="delivery" value="accra" checked={deliveryMethod === 'accra'} onChange={(e) => setDeliveryMethod(e.target.value)} className="w-5 h-5 text-blue-700" />
+                        <input type="radio" name="delivery" value="local" checked={deliveryMethod === 'local'} onChange={(e) => setDeliveryMethod(e.target.value)} className="w-5 h-5 text-blue-700" />
                         <div>
-                          <p className="font-semibold text-gray-900">Accra Delivery</p>
-                          <p className="text-sm text-gray-600">Delivery within Accra</p>
+                          <p className="font-semibold text-gray-900">Local delivery</p>
+                          <p className="text-sm text-gray-600">Delivery within your local area</p>
                         </div>
                       </div>
-                      <p className="font-bold text-gray-900">GH₵ 40.00</p>
+                      <p className="font-bold text-gray-900">TBD</p>
                     </label>
-                    <label className={`flex items-center justify-between p-4 border-2 rounded-lg cursor-pointer transition-colors ${deliveryMethod === 'outside-accra' ? 'border-blue-700 bg-blue-50' : 'border-gray-300 hover:border-gray-400'
+                    <label className={`flex items-center justify-between p-4 border-2 rounded-lg cursor-pointer transition-colors ${deliveryMethod === 'regional' ? 'border-blue-700 bg-blue-50' : 'border-gray-300 hover:border-gray-400'
                       }`}>
                       <div className="flex items-center space-x-4">
-                        <input type="radio" name="delivery" value="outside-accra" checked={deliveryMethod === 'outside-accra'} onChange={(e) => setDeliveryMethod(e.target.value)} className="w-5 h-5 text-blue-700" />
+                        <input type="radio" name="delivery" value="regional" checked={deliveryMethod === 'regional'} onChange={(e) => setDeliveryMethod(e.target.value)} className="w-5 h-5 text-blue-700" />
                         <div>
-                          <p className="font-semibold text-gray-900">Outside Accra Delivery</p>
-                          <p className="text-sm text-gray-600">Delivery to bus stations (VIP, OA, STC, etc.)</p>
+                          <p className="font-semibold text-gray-900">Regional delivery</p>
+                          <p className="text-sm text-gray-600">Delivery to regional hubs or partner locations</p>
                         </div>
                       </div>
-                      <p className="font-bold text-gray-900">GH₵ 30.00</p>
+                      <p className="font-bold text-gray-900">TBD</p>
                     </label>
                     */}
                   </div>

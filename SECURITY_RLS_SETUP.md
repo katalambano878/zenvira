@@ -7,7 +7,7 @@ Your Supabase anon key is public (visible in browser JavaScript). Without RLS, *
 ## How to Enable RLS
 
 Go to your Supabase Dashboard:
-**https://supabase.com/dashboard/project/bskojprmfxugvkycvetc**
+**https://supabase.com/dashboard/project/your-project-ref**
 
 Navigate to: **Database → Tables** (or **Table Editor**)
 

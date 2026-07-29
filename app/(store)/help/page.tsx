@@ -118,7 +118,7 @@ export default function HelpCenterPage() {
         <PageHero
           title="How can we help you?"
           subtitle="Search our help center or browse by category"
-          backgroundImage="/zenvira-page-hero-3.png"
+          backgroundImage="/logo.png"
         />
         <div className="max-w-2xl mx-auto px-4 -mt-16 relative z-20 pb-8">
           <div className="relative">

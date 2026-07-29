@@ -1,12 +1,24 @@
 /**
- * Upload product images to Supabase Storage and build a map of filename -> public URL.
+ * Upload product images to local disk and build a map of filename -> public URL.
  */
 
-import { supabaseAdmin } from '@/lib/supabase-admin';
+import { mkdir, writeFile } from 'fs/promises';
+import path from 'path';
+import { compressImageBuffer } from '@/lib/image-compress';
 
-const BUCKET = 'products';
-const MAX_FILE_SIZE_BYTES = 10 * 1024 * 1024; // 10MB per image
+const MAX_FILE_SIZE_BYTES = 10 * 1024 * 1024;
 const ALLOWED_EXT = new Set(['.jpg', '.jpeg', '.png', '.webp', '.gif']);
+
+function uploadRoot() {
+  return process.env.UPLOAD_DIR || path.join(process.cwd(), 'uploads');
+}
+
+function publicBase() {
+  const base =
+    process.env.NEXT_PUBLIC_UPLOAD_BASE_URL ||
+    `${(process.env.NEXT_PUBLIC_APP_URL || '').replace(/\/+$/, '')}/uploads`;
+  return base.replace(/\/+$/, '');
+}
 
 function getExt(name: string): string {
   const i = name.lastIndexOf('.');
@@ -18,6 +30,13 @@ function safeStorageName(original: string): string {
     .toLowerCase()
     .replace(/\s+/g, '-')
     .replace(/[^a-z0-9._-]/g, '');
+}
+
+function contentTypeForExt(ext: string): string {
+  if (ext === '.png') return 'image/png';
+  if (ext === '.gif') return 'image/gif';
+  if (ext === '.webp') return 'image/webp';
+  return 'image/jpeg';
 }
 
 export interface UploadProgress {
@@ -36,6 +55,10 @@ export async function uploadProductImages(
   const toUpload = Array.from(referencedNames).filter((name) => images.has(name));
   const total = toUpload.length;
   let current = 0;
+
+  const folder = prefix.replace(/[^a-z0-9/_-]/gi, '') || 'import';
+  const absDir = path.join(uploadRoot(), folder);
+  await mkdir(absDir, { recursive: true });
 
   for (const filename of toUpload) {
     const buf = images.get(filename)!;
@@ -57,32 +80,31 @@ export async function uploadProductImages(
       continue;
     }
 
-    const base = safeStorageName(filename);
-    const path = `${prefix}/${base}`;
-
-    const { error } = await supabaseAdmin.storage.from(BUCKET).upload(path, buf, {
-      contentType: ext === '.png' ? 'image/png' : ext === '.gif' ? 'image/gif' : ext === '.webp' ? 'image/webp' : 'image/jpeg',
-      upsert: true,
-    });
-
-    if (error) {
+    try {
+      const base = safeStorageName(filename);
+      const contentType = contentTypeForExt(ext);
+      const compressed = await compressImageBuffer(buf, contentType);
+      const outBuf = Buffer.from(compressed.buffer);
+      const outExt = compressed.contentType.includes('webp') ? '.webp' : ext;
+      const storedName = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}-${base.replace(ext, '')}${outExt}`;
+      const relative = path.posix.join(folder, storedName);
+      await writeFile(path.join(uploadRoot(), folder, storedName), outBuf);
+      const publicUrl = `${publicBase()}/${relative}`;
+      urlMap.set(filename.toLowerCase().trim(), publicUrl);
+      urlMap.set(filename, publicUrl);
+      current++;
+      onProgress?.({
+        current,
+        total,
+        message: `Uploaded ${filename}`,
+      });
+    } catch (err: unknown) {
       onProgress?.({
         current: ++current,
         total,
-        message: `Failed ${filename}: ${error.message}`,
+        message: `Failed ${filename}: ${err instanceof Error ? err.message : 'upload error'}`,
       });
-      continue;
     }
-
-    const { data: { publicUrl } } = supabaseAdmin.storage.from(BUCKET).getPublicUrl(path);
-    urlMap.set(filename.toLowerCase().trim(), publicUrl);
-    urlMap.set(filename, publicUrl);
-    current++;
-    onProgress?.({
-      current,
-      total,
-      message: `Uploaded ${filename}`,
-    });
   }
 
   return urlMap;

@@ -79,7 +79,7 @@ export default function AddressBook() {
               <input
                 type="text"
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-700 focus:border-transparent"
-                placeholder="Accra"
+                placeholder="City"
               />
             </div>
             <div>
@@ -87,7 +87,7 @@ export default function AddressBook() {
               <input
                 type="text"
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-700 focus:border-transparent"
-                placeholder="Greater Accra"
+                placeholder="Region"
               />
             </div>
             <div>

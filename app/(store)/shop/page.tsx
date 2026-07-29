@@ -6,7 +6,6 @@ import { usePageTitle } from '@/hooks/usePageTitle';
 import ProductCard, { type ColorVariant } from '@/components/ProductCard';
 import ProductCardSkeleton from '@/components/skeletons/ProductCardSkeleton';
 import { getColorHex } from '@/components/ProductCard';
-import { supabase } from '@/lib/supabase';
 import { cachedQuery } from '@/lib/query-cache';
 import PageHero from '@/components/PageHero';
 
@@ -69,81 +68,69 @@ function ShopContent() {
         const { data, count, error } = await cachedQuery<{ data: any; count: any; error: any }>(
           cacheKey,
           async () => {
-            // Left join categories so products without category_id still load (!inner hid them all)
-            let query = supabase
-              .from('products')
-              .select(`
-                *,
-                categories(name, slug),
-                product_images(url, position),
-                product_variants(id, name, price, quantity, option1, option2, image_url)
-              `, { count: 'exact' })
-              .eq('status', 'active');
+            const categoryParam =
+              selectedCategory !== 'all' ? `&category=${encodeURIComponent(selectedCategory)}` : '';
+            const res = await fetch(`/api/storefront/products?limit=500${categoryParam}`);
+            if (!res.ok) {
+              return { data: null, count: 0, error: new Error('Failed to load products') };
+            }
+            let list: any[] = await res.json();
 
-            // Search
             if (search) {
-              query = query.ilike('name', `%${search}%`);
+              const q = search.toLowerCase();
+              list = list.filter((p) => p.name?.toLowerCase().includes(q) || p.slug?.toLowerCase().includes(q));
             }
 
-            // Category Filter with Subcategories
             if (selectedCategory !== 'all') {
-              const categoryObj = categories.find(c => c.slug === selectedCategory);
-
+              const categoryObj = categories.find((c) => c.slug === selectedCategory);
               if (categoryObj) {
                 const targetSlugs = [selectedCategory];
                 const childSlugs = categories
-                  .filter(c => c.parent_id === categoryObj.id)
-                  .map(c => c.slug);
+                  .filter((c) => c.parent_id === categoryObj.id)
+                  .map((c) => c.slug);
                 targetSlugs.push(...childSlugs);
-                query = query.in('categories.slug', targetSlugs);
+                list = list.filter((p) => targetSlugs.includes(p.categories?.slug));
               } else {
-                query = query.eq('categories.slug', selectedCategory);
+                list = list.filter((p) => p.categories?.slug === selectedCategory);
               }
             }
 
-            // Price Filter
             if (priceRange[1] < 5000) {
-              query = query.gte('price', priceRange[0]).lte('price', priceRange[1]);
+              list = list.filter((p) => Number(p.price) >= priceRange[0] && Number(p.price) <= priceRange[1]);
             }
 
-            // Rating Filter
             if (selectedRating > 0) {
-              query = query.gte('rating_avg', selectedRating);
+              list = list.filter((p) => Number(p.rating_avg || 0) >= selectedRating);
             }
 
-            // Sorting
             switch (sortBy) {
               case 'price-low':
-                query = query.order('price', { ascending: true });
+                list.sort((a, b) => Number(a.price) - Number(b.price));
                 break;
               case 'price-high':
-                query = query.order('price', { ascending: false });
+                list.sort((a, b) => Number(b.price) - Number(a.price));
                 break;
               case 'rating':
-                query = query.order('rating_avg', { ascending: false });
+                list.sort((a, b) => Number(b.rating_avg || 0) - Number(a.rating_avg || 0));
                 break;
-              case 'new':
-                query = query.order('created_at', { ascending: false });
-                break;
-              case 'popular':
               default:
-                query = query.order('created_at', { ascending: false });
+                list.sort(
+                  (a, b) =>
+                    new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime()
+                );
                 break;
             }
 
-            // Pagination
+            const total = list.length;
             const from = (page - 1) * productsPerPage;
-            const to = from + productsPerPage - 1;
-            query = query.range(from, to);
-
-            const result = await query;
-            return result;
+            const pageSlice = list.slice(from, from + productsPerPage);
+            return { data: pageSlice, count: total, error: null };
           },
           2 * 60 * 1000 // Cache for 2 minutes
         );
 
         if (error) {
-          console.error('[Shop] Supabase error:', error.message, error.code, error.details, error.hint);
+          console.error('[Shop] Products error:', error);
           throw error;
         }
 
@@ -208,8 +195,8 @@ function ShopContent() {
     <main className="min-h-screen bg-white">
       <PageHero
         title="Shop All Products"
-        subtitle="Browse our range of perfumes and fragrances"
-        backgroundImage="/zenvira-page-hero-2.png"
+        subtitle="Browse our product catalog"
+        backgroundImage="/logo.png"
       />
 
       {/* Mobile Filter Toggle */}

@@ -1,8 +1,7 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useCMS } from '@/context/CMSContext';
-import { supabase } from '@/lib/supabase';
 import PageHero from '@/components/PageHero';
 import { usePageTitle } from '@/hooks/usePageTitle';
 import { useRecaptcha } from '@/hooks/useRecaptcha';
@@ -17,7 +16,6 @@ import {
 export default function ContactPage() {
   usePageTitle('Contact Us');
   const { getSetting } = useCMS();
-  const [pageContent, setPageContent] = useState<any>(null);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -28,22 +26,6 @@ export default function ContactPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
   const { getToken, verifying } = useRecaptcha();
-
-  useEffect(() => {
-    async function fetchContactContent() {
-      const { data } = await supabase
-        .from('cms_content')
-        .select('*')
-        .eq('section', 'contact')
-        .eq('block_key', 'main')
-        .single();
-
-      if (data) {
-        setPageContent(data);
-      }
-    }
-    fetchContactContent();
-  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -59,23 +41,6 @@ export default function ContactPage() {
     }
 
     try {
-      // Store in Supabase
-      const { error } = await supabase
-        .from('contact_submissions')
-        .insert({
-          name: formData.name,
-          email: formData.email,
-          phone: formData.phone,
-          subject: formData.subject,
-          message: formData.message,
-        });
-
-      if (error) {
-        // Table might not exist, still show success
-        console.log('Note: contact_submissions table may not exist');
-      }
-
-      // Send Contact Notification
       fetch('/api/notifications', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -95,7 +60,7 @@ export default function ContactPage() {
   };
 
   // Get contact details from CMS settings
-  const contactEmail = getSetting('contact_email') || process.env.NEXT_PUBLIC_CONTACT_EMAIL || 'contact@example.com';
+  const contactEmail = getSetting('contact_email') || process.env.NEXT_PUBLIC_CONTACT_EMAIL || 'hello@example.com';
   const contactPhone = getSetting('contact_phone') || process.env.NEXT_PUBLIC_CONTACT_PHONE || '';
   const contactWhatsapp = getSetting('contact_whatsapp') || process.env.NEXT_PUBLIC_CONTACT_WHATSAPP || process.env.NEXT_PUBLIC_CONTACT_PHONE || '';
   const contactAddress = sanitizeAddressDisplay(
@@ -106,9 +71,8 @@ export default function ContactPage() {
   const ytHandle = getSocialYoutubeHandle();
   const scHandle = getSocialSnapchatHandle();
 
-  const heroTitle = pageContent?.title || 'Get In Touch';
-  const heroSubtitle = pageContent?.subtitle || 'Have a question or need assistance?';
-  const heroContent = pageContent?.content || 'Our friendly team is here to help. Reach out through any of our contact channels.';
+  const heroTitle = 'Get In Touch';
+  const heroSubtitle = 'Have a question or need assistance?';
 
   const waNumber = (contactWhatsapp || '').replace(/[^0-9]/g, '');
   const waLink = waNumber ? (waNumber.startsWith('0') ? `https://wa.me/233${waNumber.slice(1)}` : `https://wa.me/${waNumber}`) : '#';
@@ -182,15 +146,15 @@ export default function ContactPage() {
   const faqs = [
     {
       question: 'What are your delivery times?',
-      answer: 'Standard delivery takes 2-5 business days within Ghana. Express delivery is available for Accra and Kumasi. We ship perfumes and fragrances with care.'
+      answer: 'Delivery times depend on your location and shipping method. Configure zones and timeframes in your CMS or replace this placeholder copy before launch.'
     },
     {
       question: 'Do you offer international shipping?',
-      answer: 'Currently, we ship within Ghana only. We handle all logistics so you simply order and receive your perfumes.'
+      answer: 'Shipping regions are configurable. Update this answer with your actual delivery areas in the admin CMS or contact settings.'
     },
     {
       question: 'What payment methods do you accept?',
-      answer: 'We accept MOMO, Instant Bank Transfer, Cash (in store only), and Visa Card. Please note we do not accept payment on delivery.'
+      answer: 'Payment methods are configured in checkout (e.g. mobile money, card). Replace this placeholder with your accepted methods.'
     }
   ];
 
@@ -199,7 +163,7 @@ export default function ContactPage() {
       <PageHero
         title="Get In Touch"
         subtitle="Have a question? We're here to help. Mon–Sat 9:00 AM – 7:00 PM. Closed Sundays."
-        backgroundImage="/zenvira-page-hero-3.png"
+        backgroundImage="/logo.png"
       />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">

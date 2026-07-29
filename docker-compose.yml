@@ -1,0 +1,38 @@
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: sikahomes
+      POSTGRES_USER: sikahomes
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-changeme}
+    volumes:
+      - sikahomes_pg:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U sikahomes -d sikahomes"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build: .
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    env_file:
+      - .env.local
+    environment:
+      DATABASE_URL: postgresql://sikahomes:${POSTGRES_PASSWORD:-changeme}@db:5432/sikahomes
+      NEXT_PUBLIC_APP_URL: http://localhost:3000
+      UPLOAD_DIR: /var/www/sikahomes/uploads
+    volumes:
+      - sikahomes_uploads:/var/www/sikahomes/uploads
+    ports:
+      - "3000:3000"
+
+volumes:
+  sikahomes_pg:
+  sikahomes_uploads:

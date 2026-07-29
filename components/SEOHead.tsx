@@ -37,7 +37,7 @@ export function generateMetadata({
   noindex = false
 }: SEOProps): Metadata {
   const siteUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://example.com';
-  const defaultOgImage = `${siteUrl}/neww.png`;
+  const defaultOgImage = `${siteUrl}/logo.png`;
   const resolvedOgImage = ogImage || defaultOgImage;
   const siteName = getSiteName();
   const resolvedTitle = title ?? getDefaultTitleSuffix();
@@ -181,8 +181,8 @@ export function generateOrganizationSchema() {
     '@type': 'Organization',
     name: getSiteName(),
     url: siteUrl,
-    logo: `${siteUrl}/neww.png`,
-    image: `${siteUrl}/neww.png`,
+    logo: `${siteUrl}/logo.png`,
+    image: `${siteUrl}/logo.png`,
     contactPoint: cp,
   };
 }

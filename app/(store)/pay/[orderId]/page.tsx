@@ -3,7 +3,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { supabase } from '@/lib/supabase';
 import { usePageTitle } from '@/hooks/usePageTitle';
 
 export default function PaymentPage() {
@@ -21,19 +20,13 @@ export default function PaymentPage() {
     async function fetchOrder() {
       try {
         // Fetch order by ID (UUID) or order_number
-        let query = supabase
-          .from('orders')
-          .select('*')
-          .or(`id.eq.${orderId},order_number.eq.${orderId}`)
-          .single();
-
-        const { data, error: fetchError } = await query;
-
-        if (fetchError || !data) {
+        const res = await fetch(`/api/orders/summary?order_number=${encodeURIComponent(orderId)}`);
+        if (!res.ok) {
           setError('Order not found. Please check your link and try again.');
           setLoading(false);
           return;
         }
+        const data = await res.json();
 
         setOrder(data);
 
@@ -130,7 +123,7 @@ export default function PaymentPage() {
         {/* Header */}
         <div className="text-center mb-8">
           <Link href="/" className="inline-block mb-6">
-            <span className="text-2xl font-['Pacifico'] text-blue-700">{process.env.NEXT_PUBLIC_SITE_NAME || 'Your Store'}</span>
+            <span className="text-2xl font-['Pacifico'] text-blue-700">{process.env.NEXT_PUBLIC_SITE_NAME || 'New Project'}</span>
           </Link>
           <h1 className="text-2xl font-bold text-gray-900">Complete Your Payment</h1>
           <p className="text-gray-600 mt-2">Hi {customerName}, your order is waiting for payment.</p>

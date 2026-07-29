@@ -1,9 +1,8 @@
 /**
  * Create products, product_images, and product_variants from parsed CSV rows.
- * Groups rows by product name only (SKU is auto-generated). Variants use Color × Size (option1=size, option2=color, metadata.color_hex).
  */
 
-import { supabaseAdmin } from '@/lib/supabase-admin';
+import { query, queryOne } from '@/lib/db';
 import type { ParsedProductRow } from './csv-parser';
 import { sanitizeHtml } from '@/lib/sanitize';
 
@@ -45,8 +44,8 @@ async function ensureUniqueSlug(baseSlug: string): Promise<string> {
   let slug = baseSlug;
   let n = 1;
   while (true) {
-    const { data } = await supabaseAdmin.from('products').select('id').eq('slug', slug).maybeSingle();
-    if (!data) return slug;
+    const row = await queryOne<{ id: string }>(`SELECT id FROM products WHERE slug = $1 LIMIT 1`, [slug]);
+    if (!row) return slug;
     slug = `${baseSlug}-${n}`;
     n++;
   }
@@ -64,13 +63,11 @@ export interface CategoryLookup {
 }
 
 export async function buildCategoryLookup(): Promise<CategoryLookup> {
-  const { data: categories, error } = await supabaseAdmin
-    .from('categories')
-    .select('id, name')
-    .eq('status', 'active');
-  if (error) return { byName: new Map() };
+  const result = await query<{ id: string; name: string }>(
+    `SELECT id, name FROM categories WHERE status = 'active'`
+  );
   const byName = new Map<string, string>();
-  for (const c of categories ?? []) {
+  for (const c of result.rows) {
     const key = (c.name ?? '').trim().toLowerCase();
     if (key) byName.set(key, c.id);
   }
@@ -78,21 +75,18 @@ export async function buildCategoryLookup(): Promise<CategoryLookup> {
 }
 
 export async function getExistingProductNames(): Promise<Set<string>> {
-  const { data, error } = await supabaseAdmin.from('products').select('name');
-  if (error) return new Set();
+  const result = await query<{ name: string }>(`SELECT name FROM products`);
   const set = new Set<string>();
-  for (const row of data ?? []) {
+  for (const row of result.rows) {
     if (row.name) set.add(String(row.name).trim().toLowerCase());
   }
   return set;
 }
 
-/** Map lowercase product name -> product id (for update-existing flow). */
 export async function getExistingProductIdsByName(): Promise<Map<string, string>> {
-  const { data, error } = await supabaseAdmin.from('products').select('id, name');
-  if (error) return new Map();
+  const result = await query<{ id: string; name: string }>(`SELECT id, name FROM products`);
   const map = new Map<string, string>();
-  for (const row of data ?? []) {
+  for (const row of result.rows) {
     if (row.name) map.set(String(row.name).trim().toLowerCase(), row.id);
   }
   return map;
@@ -200,45 +194,93 @@ export async function createProductsFromRows(
     if (exists && updateExisting) {
       const existingId = existingIdsByName.get(nameKey);
       if (existingId) {
-        const { error: updateErr } = await supabaseAdmin
-          .from('products')
-          .update({
-            description: productPayload.description,
-            price: productPayload.price,
-            compare_at_price: productPayload.compare_at_price,
-            quantity: productPayload.quantity,
-            moq: productPayload.moq,
-            status: productPayload.status,
-            featured: productPayload.featured,
-            seo_title: productPayload.seo_title,
-            seo_description: productPayload.seo_description,
-            tags: productPayload.tags,
-            category_id: productPayload.category_id,
-            metadata: productPayload.metadata,
-          })
-          .eq('id', existingId);
-        if (updateErr) {
+        try {
+          await queryOne(
+            `UPDATE products SET
+              description = $2,
+              price = $3,
+              compare_at_price = $4,
+              quantity = $5,
+              moq = $6,
+              status = $7::product_status,
+              featured = $8,
+              seo_title = $9,
+              seo_description = $10,
+              tags = $11,
+              category_id = $12,
+              metadata = $13::jsonb,
+              updated_at = now()
+            WHERE id = $1`,
+            [
+              existingId,
+              productPayload.description,
+              productPayload.price,
+              productPayload.compare_at_price,
+              productPayload.quantity,
+              productPayload.moq,
+              productPayload.status,
+              productPayload.featured,
+              productPayload.seo_title,
+              productPayload.seo_description,
+              productPayload.tags,
+              productPayload.category_id,
+              JSON.stringify(productPayload.metadata),
+            ]
+          );
+          productId = existingId;
+        } catch (err: unknown) {
           errors++;
-          onProduct?.({ rowIndex: first.rowIndex, name: first.name, status: 'error', error: updateErr.message });
+          onProduct?.({
+            rowIndex: first.rowIndex,
+            name: first.name,
+            status: 'error',
+            error: err instanceof Error ? err.message : 'Update failed',
+          });
           continue;
         }
-        productId = existingId;
       }
     }
 
     if (!productId) {
-      const { data: inserted, error: insertErr } = await supabaseAdmin
-        .from('products')
-        .insert(productPayload)
-        .select('id')
-        .single();
-      if (insertErr) {
+      try {
+        const inserted = await queryOne<{ id: string }>(
+          `INSERT INTO products (
+            name, slug, sku, description, price, compare_at_price, quantity, moq,
+            status, featured, seo_title, seo_description, tags, category_id, metadata
+          ) VALUES (
+            $1, $2, $3, $4, $5, $6, $7, $8, $9::product_status, $10, $11, $12, $13, $14, $15::jsonb
+          ) RETURNING id`,
+          [
+            productPayload.name,
+            productPayload.slug,
+            productPayload.sku,
+            productPayload.description,
+            productPayload.price,
+            productPayload.compare_at_price,
+            productPayload.quantity,
+            productPayload.moq,
+            productPayload.status,
+            productPayload.featured,
+            productPayload.seo_title,
+            productPayload.seo_description,
+            productPayload.tags,
+            productPayload.category_id,
+            JSON.stringify(productPayload.metadata),
+          ]
+        );
+        if (!inserted) throw new Error('Insert failed');
+        productId = inserted.id;
+        created++;
+      } catch (err: unknown) {
         errors++;
-        onProduct?.({ rowIndex: first.rowIndex, name: first.name, status: 'error', error: insertErr.message });
+        onProduct?.({
+          rowIndex: first.rowIndex,
+          name: first.name,
+          status: 'error',
+          error: err instanceof Error ? err.message : 'Insert failed',
+        });
         continue;
       }
-      productId = inserted.id;
-      created++;
     }
 
     const imageUrls: string[] = [];
@@ -250,25 +292,24 @@ export async function createProductsFromRows(
     }
     if (productId && imageUrls.length > 0) {
       if (!updateExisting) {
-        await supabaseAdmin.from('product_images').delete().eq('product_id', productId);
+        await query(`DELETE FROM product_images WHERE product_id = $1`, [productId]);
       }
-      const existingPositions = updateExisting
-        ? ((await supabaseAdmin.from('product_images').select('position').eq('product_id', productId).order('position', { ascending: false }).limit(1)).data?.[0]?.position ?? -1)
-        : -1;
-      const startPos = existingPositions + 1;
-      await supabaseAdmin.from('product_images').insert(
-        imageUrls.map((url, pos) => ({
-          product_id: productId,
-          url,
-          position: startPos + pos,
-          alt_text: first.name,
-        }))
+      const posRow = await queryOne<{ position: number }>(
+        `SELECT position FROM product_images WHERE product_id = $1 ORDER BY position DESC LIMIT 1`,
+        [productId]
       );
+      const startPos = updateExisting ? (posRow?.position ?? -1) + 1 : 0;
+      for (let pos = 0; pos < imageUrls.length; pos++) {
+        await query(
+          `INSERT INTO product_images (product_id, url, position, alt_text) VALUES ($1, $2, $3, $4)`,
+          [productId, imageUrls[pos], startPos + pos, first.name]
+        );
+      }
     }
 
     if (hasVariants && productId) {
       if (!updateExisting) {
-        await supabaseAdmin.from('product_variants').delete().eq('product_id', productId);
+        await query(`DELETE FROM product_variants WHERE product_id = $1`, [productId]);
       }
       for (const r of group) {
         const hasVariantData = r.variant_color || r.variant_size || r.variant_price !== undefined || (r.variant_stock !== undefined && r.variant_stock >= 0);
@@ -279,18 +320,25 @@ export async function createProductsFromRows(
         const variantName = size || color || 'Default';
         const colorHex = resolveColorHex(r.variant_color, r.variant_color_hex);
 
-        const variantPayload = {
-          product_id: productId,
-          name: variantName,
-          sku: null,
-          price: r.variant_price ?? r.price,
-          quantity: r.variant_stock ?? 0,
-          option1: size,
-          option2: color,
-          metadata: colorHex ? { color_hex: colorHex } : {},
-        };
-        const { error: varErr } = await supabaseAdmin.from('product_variants').insert(variantPayload);
-        if (!varErr) variantsCreated++;
+        try {
+          await query(
+            `INSERT INTO product_variants (product_id, name, sku, price, quantity, option1, option2, metadata)
+             VALUES ($1, $2, $3, $4, $5, $6, $7, $8::jsonb)`,
+            [
+              productId,
+              variantName,
+              null,
+              r.variant_price ?? r.price,
+              r.variant_stock ?? 0,
+              size,
+              color,
+              JSON.stringify(colorHex ? { color_hex: colorHex } : {}),
+            ]
+          );
+          variantsCreated++;
+        } catch {
+          // non-fatal per variant
+        }
       }
     }
 

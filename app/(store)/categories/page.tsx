@@ -1,24 +1,26 @@
 import Link from 'next/link';
-import { supabase } from '@/lib/supabase';
 import PageHero from '@/components/PageHero';
+import { listCategories } from '@/lib/data/products';
 
-export const revalidate = 0; // Ensure fresh data on every visit
+export const dynamic = 'force-dynamic';
 
 export default async function CategoriesPage() {
-  const { data: categoriesData } = await supabase
-    .from('categories')
-    .select(`
-      id,
-      name,
-      slug,
-      description,
-      image_url,
-      position
-    `)
-    .eq('status', 'active')
-    .order('position', { ascending: true });
+  let categoriesData: Array<{
+    id: string;
+    slug: string;
+    name: string;
+    description?: string | null;
+    image_url?: string | null;
+  }> = [];
+  try {
+    const { isDatabaseConfigured } = await import('@/lib/db');
+    if (isDatabaseConfigured()) {
+      categoriesData = (await listCategories(true)) as typeof categoriesData;
+    }
+  } catch {
+    categoriesData = [];
+  }
 
-  // Palette to cycle through for visual variety since DB doesn't have colors
   const palette = [
     { color: 'from-blue-500 to-blue-700', icon: 'ri-store-2-line' },
     { color: 'from-blue-500 to-blue-700', icon: 'ri-shopping-bag-3-line' },
@@ -28,24 +30,24 @@ export default async function CategoriesPage() {
     { color: 'from-indigo-500 to-indigo-700', icon: 'ri-star-smile-line' },
   ];
 
-  const categories = categoriesData?.map((c, i) => {
-    const style = palette[i % palette.length];
-    return {
-      ...c,
-      image: c.image_url || 'https://via.placeholder.com/600x400?text=Category',
-      color: style.color,
-      icon: style.icon,
-      // Optional: Fetch product count if needed, currently skipping for performance/simplicity
-      productCount: 'Browse',
-    };
-  }) || [];
+  const categories =
+    categoriesData?.map((c, i) => {
+      const style = palette[i % palette.length];
+      return {
+        ...c,
+        image: c.image_url || 'https://via.placeholder.com/600x400?text=Category',
+        color: style.color,
+        icon: style.icon,
+        productCount: 'Browse',
+      };
+    }) || [];
 
   return (
     <div className="min-h-screen bg-white">
       <PageHero
         title="Shop by Category"
-        subtitle="Browse our perfume categories"
-        backgroundImage="/zenvira-page-hero-4.png"
+        subtitle="Browse product categories"
+        backgroundImage="/logo.png"
       />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
