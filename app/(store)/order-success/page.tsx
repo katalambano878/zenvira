@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
-import { Suspense, useState, useEffect } from 'react';
+import { Suspense, useState, useEffect, useCallback } from 'react';
 
 function OrderSuccessContent() {
   const searchParams = useSearchParams();
@@ -14,11 +14,55 @@ function OrderSuccessContent() {
   const [showConfetti, setShowConfetti] = useState(true);
   const [verifying, setVerifying] = useState(false);
 
-  const summaryUrl = (orderNum: string) => {
-    const params = new URLSearchParams({ order_number: orderNum });
-    if (emailParam) params.set('email', emailParam);
-    return `/api/orders/summary?${params.toString()}`;
-  };
+  const summaryUrl = useCallback(
+    (orderNum: string) => {
+      const params = new URLSearchParams({ order_number: orderNum });
+      if (emailParam) params.set('email', emailParam);
+      return `/api/orders/summary?${params.toString()}`;
+    },
+    [emailParam]
+  );
+
+  // Payment verification — redirect alone is not trusted; server verifies with Moolre.
+  const verifyPayment = useCallback(
+    async (orderNum: string) => {
+      setVerifying(true);
+
+      await new Promise((resolve) => setTimeout(resolve, 3000));
+
+      const refreshedRes = await fetch(summaryUrl(orderNum), { credentials: 'include' });
+      const refreshed = refreshedRes.ok ? await refreshedRes.json() : null;
+
+      if (refreshed?.payment_status === 'paid') {
+        setOrder(refreshed);
+        setVerifying(false);
+        return;
+      }
+
+      try {
+        const res = await fetch('/api/payment/moolre/verify', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ orderNumber: orderNum }),
+        });
+
+        const result = await res.json();
+
+        if (result.success && result.payment_status === 'paid') {
+          const updatedRes = await fetch(summaryUrl(orderNum), { credentials: 'include' });
+          if (updatedRes.ok) {
+            const updated = await updatedRes.json();
+            if (updated) setOrder(updated);
+          }
+        }
+      } catch (err) {
+        console.error('Payment verification failed:', err);
+      } finally {
+        setVerifying(false);
+      }
+    },
+    [summaryUrl]
+  );
 
   useEffect(() => {
     async function fetchOrder() {
@@ -43,45 +87,7 @@ function OrderSuccessContent() {
       }
     }
     fetchOrder();
-  }, [orderNumber, paymentSuccess, emailParam]);
-
-  // Payment verification — redirect alone is not trusted; server verifies with Moolre.
-  const verifyPayment = async (orderNum: string) => {
-    setVerifying(true);
-
-    await new Promise((resolve) => setTimeout(resolve, 3000));
-
-    const refreshedRes = await fetch(summaryUrl(orderNum), { credentials: 'include' });
-    const refreshed = refreshedRes.ok ? await refreshedRes.json() : null;
-
-    if (refreshed?.payment_status === 'paid') {
-      setOrder(refreshed);
-      setVerifying(false);
-      return;
-    }
-
-    try {
-      const res = await fetch('/api/payment/moolre/verify', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ orderNumber: orderNum }),
-      });
-
-      const result = await res.json();
-
-      if (result.success && result.payment_status === 'paid') {
-        const updatedRes = await fetch(summaryUrl(orderNum), { credentials: 'include' });
-        if (updatedRes.ok) {
-          const updated = await updatedRes.json();
-          if (updated) setOrder(updated);
-        }
-      }
-    } catch (err) {
-      console.error('Payment verification failed:', err);
-    } finally {
-      setVerifying(false);
-    }
-  };
+  }, [orderNumber, paymentSuccess, summaryUrl, verifyPayment]);
 
   if (loading) {
     return (
