@@ -75,11 +75,20 @@ export default function ProductCard({
 }: ProductCardProps) {
   const { addToCart } = useCart();
   const [activeColor, setActiveColor] = useState<string | null>(null);
-  const displayPrice = hasVariants && minVariantPrice ? minVariantPrice : price;
-  const discount = originalPrice ? Math.round((1 - displayPrice / originalPrice) * 100) : 0;
+  const numericPrice = Number(price) || 0;
+  const numericOriginal = originalPrice != null ? Number(originalPrice) : undefined;
+  const numericMinVariant = minVariantPrice != null ? Number(minVariantPrice) : undefined;
+  const displayPrice =
+    hasVariants && numericMinVariant != null && !Number.isNaN(numericMinVariant)
+      ? numericMinVariant
+      : numericPrice;
+  const discount =
+    numericOriginal && numericOriginal > 0
+      ? Math.round((1 - displayPrice / numericOriginal) * 100)
+      : 0;
   const MAX_SWATCHES = 5;
 
-  const formatPrice = (val: number) => `GH\u20B5${val.toFixed(2)}`;
+  const formatPrice = (val: number) => `GH\u20B5${Number(val).toFixed(2)}`;
 
   return (
     <div className="group bg-transparent rounded-lg h-full flex flex-col hover-lift">
