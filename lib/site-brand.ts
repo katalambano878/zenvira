@@ -22,10 +22,16 @@ export const SITE_DEFAULT_TITLE = getDefaultTitleSuffix();
 export const SITE_DEFAULT_DESCRIPTION = getDefaultMetaDescription();
 
 export const SITE_KEYWORDS = [
-  getSiteName(),
-  'online store',
-  'e-commerce',
-  'shop online',
+  'Sika Homes',
+  'furniture Ghana',
+  'sofas Accra',
+  'home furnishing',
+  'beds and mattresses',
+  'living room furniture',
+  'dining tables',
+  'interior décor',
+  'buy furniture online Ghana',
+  'home interiors',
 ] as const;
 
 export const BRAND_ASSETS = {
@@ -58,6 +64,6 @@ export const SITE_CONTACT = {
   email: getContactEmail(),
   phonePrimary: getContactPhoneTel() || getContactPhoneDisplay(),
   phoneSecondary: '',
-  areaServed: '',
+  areaServed: 'Ghana',
   addressLocality: getContactAddress(),
 } as const;

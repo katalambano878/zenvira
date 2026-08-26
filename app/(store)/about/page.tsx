@@ -4,41 +4,43 @@ import Link from 'next/link';
 import { useCMS } from '@/context/CMSContext';
 import PageHero from '@/components/PageHero';
 import { usePageTitle } from '@/hooks/usePageTitle';
+import { getSiteName, getSiteTagline } from '@/lib/site-defaults';
 
 export default function AboutPage() {
   usePageTitle('About');
   const { getSetting } = useCMS();
 
-  const siteName = getSetting('site_name') || process.env.NEXT_PUBLIC_SITE_NAME || 'New Project';
+  const siteName = getSetting('site_name') || getSiteName();
+  const tagline = getSetting('site_tagline') || getSiteTagline();
 
   const values = [
     {
-      icon: 'ri-verified-badge-line',
-      title: 'Quality First',
-      description: 'Products you can trust — selected and checked before they reach you.'
+      icon: 'ri-sofa-line',
+      title: 'Furniture that fits',
+      description: 'Sofas, beds, tables and décor chosen for real Ghanaian homes — style, comfort and everyday use.',
     },
     {
-      icon: 'ri-shopping-bag-line',
-      title: 'Simple Shopping',
-      description: 'Browse, add to cart, and checkout with a straightforward online experience.'
+      icon: 'ri-home-smile-line',
+      title: 'Shop by room',
+      description: 'Browse living room, bedroom, dining, kitchen, office and outdoor ranges without the guesswork.',
     },
     {
-      icon: 'ri-customer-service-2-line',
-      title: 'Helpful Support',
-      description: 'Questions about an order? Reach us through the Contact page.'
+      icon: 'ri-whatsapp-line',
+      title: 'WhatsApp-ready help',
+      description: 'Ask about dimensions, fabrics or delivery before you buy — we respond on the channels you already use.',
     },
     {
       icon: 'ri-truck-line',
-      title: 'Flexible Delivery',
-      description: 'Pickup and delivery options at checkout — see Shipping for details.'
-    }
+      title: 'Large-item delivery',
+      description: 'Furniture is not a small parcel. We plan shipping and installation-friendly delivery for bulky pieces.',
+    },
   ];
 
   return (
     <div className="min-h-screen bg-white">
       <PageHero
-        title="About Us"
-        subtitle={`${siteName} — a clean starting point for your online store.`}
+        title={`About ${siteName}`}
+        subtitle={tagline}
         backgroundImage="/logo.png"
       />
 
@@ -46,65 +48,69 @@ export default function AboutPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div>
-              <h2 className="text-3xl md:text-4xl font-serif text-gray-900 mb-6">Who We Are</h2>
-              <div className="space-y-4 text-lg text-gray-600 leading-relaxed">
+              <h2 className="text-3xl md:text-4xl font-serif text-stone-900 mb-6">Who we are</h2>
+              <div className="space-y-4 text-lg text-stone-600 leading-relaxed">
                 <p>
-                  <strong>{siteName}</strong> is an e-commerce starter built to launch quickly. Customize branding, products, and settings in the admin, then go live when you are ready.
+                  <strong>{siteName}</strong> is a home furnishing store for Ghana — sofas, furniture,
+                  décor and the pieces that turn an empty room into a finished home.
                 </p>
                 <p>
-                  This template includes storefront pages, checkout, order tracking, and admin tools — everything you need as a foundation for a new project.
+                  We built this platform so you can browse by room, compare materials and dimensions,
+                  and checkout securely with Mobile Money — then track your order through delivery.
                 </p>
                 <p>
-                  Replace placeholder content, connect your payment provider, and add your catalog to make the store yours.
+                  Whether you are furnishing a new apartment, upgrading a living room set, or completing
+                  a dining space, {siteName} is here to help you shop with clarity and confidence.
                 </p>
               </div>
             </div>
             <div className="relative">
-              <div className="aspect-[4/3] rounded-2xl overflow-hidden shadow-2xl relative bg-gray-100 flex items-center justify-center">
-                <img
-                  src="/logo.png"
-                  alt={siteName}
-                  className="w-full h-full object-contain p-8"
-                />
+              <div className="aspect-[4/3] overflow-hidden shadow-2xl relative bg-gradient-to-br from-stone-800 via-stone-700 to-amber-900/40 flex items-end p-8">
+                <div>
+                  <p className="font-serif text-3xl text-white mb-2">{siteName}</p>
+                  <p className="text-stone-200 text-sm max-w-sm">
+                    Furniture, sofas & interiors — furnish every room beautifully.
+                  </p>
+                </div>
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      <div className="bg-gray-50 py-24">
+      <div className="bg-stone-50 py-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">What You Get</h2>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              A neutral storefront foundation — customize it for your brand and products.
+            <h2 className="text-4xl font-serif text-stone-900 mb-4">What we stand for</h2>
+            <p className="text-xl text-stone-600 max-w-2xl mx-auto">
+              A furniture storefront designed around how Ghanaian buyers actually shop for homes.
             </p>
           </div>
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {values.map((value, index) => (
-              <div key={index} className="bg-white p-8 rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
-                <div className="w-14 h-14 bg-blue-100 rounded-full flex items-center justify-center mb-6">
-                  <i className={`${value.icon} text-2xl text-blue-700`}></i>
+            {values.map((value) => (
+              <div key={value.title} className="bg-white p-8 border border-stone-100 shadow-sm">
+                <div className="w-12 h-12 bg-stone-100 flex items-center justify-center mb-6">
+                  <i className={`${value.icon} text-2xl text-stone-800`}></i>
                 </div>
-                <h3 className="text-xl font-bold text-gray-900 mb-3">{value.title}</h3>
-                <p className="text-gray-600 leading-relaxed">{value.description}</p>
+                <h3 className="text-xl font-semibold text-stone-900 mb-3">{value.title}</h3>
+                <p className="text-stone-600 leading-relaxed text-sm">{value.description}</p>
               </div>
             ))}
           </div>
         </div>
       </div>
 
-      <div className="bg-blue-900 py-24">
+      <div className="bg-stone-900 py-24">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-white">
-          <h2 className="text-4xl md:text-5xl font-bold mb-8">Ready to explore?</h2>
-          <p className="text-xl text-blue-100 mb-10 leading-relaxed max-w-2xl mx-auto">
-            Browse the shop or visit Contact for email, phone, and location details.
+          <h2 className="font-serif text-4xl md:text-5xl mb-8">Ready to furnish?</h2>
+          <p className="text-xl text-stone-300 mb-10 leading-relaxed max-w-2xl mx-auto">
+            Explore sofas, beds, dining sets and décor — or message us if you need help matching pieces to your space.
           </p>
           <Link
             href="/shop"
-            className="inline-flex items-center gap-3 bg-white text-blue-900 px-10 py-5 rounded-full font-bold text-lg hover:bg-blue-50 transition-colors shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all"
+            className="inline-flex items-center gap-3 bg-amber-100 text-stone-900 px-10 py-4 font-semibold text-lg hover:bg-white transition-colors"
           >
-            Visit Shop
+            Shop furniture
             <i className="ri-arrow-right-line"></i>
           </Link>
         </div>

@@ -45,11 +45,11 @@ export default function NewsletterSection() {
             </div>
 
             <h3 className="text-3xl md:text-4xl font-serif text-white mb-4 leading-tight">
-              Unlock <span className="italic text-sky-400">10% Off</span> <br /> Your First Order
+              New arrivals for <span className="italic text-amber-200">your home</span>
             </h3>
 
-            <p className="text-blue-100/80 text-base leading-relaxed">
-              Be the first to know about new arrivals, restocks, and exclusive offers. Replace this copy with your own newsletter message.
+            <p className="text-stone-200/90 text-base leading-relaxed">
+              Get sofa restocks, dining sets and décor drops from Sika Homes — plus occasional offers for Ghana shoppers.
             </p>
           </div>
 

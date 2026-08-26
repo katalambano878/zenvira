@@ -94,13 +94,13 @@ interface CMSContextType {
 }
 
 const defaultSettings: SiteSettings = {
-    site_name: process.env.NEXT_PUBLIC_SITE_NAME || 'New Project',
-    site_tagline: process.env.NEXT_PUBLIC_SITE_TAGLINE || 'Build something exceptional.',
+    site_name: process.env.NEXT_PUBLIC_SITE_NAME || 'Sika Homes',
+    site_tagline: process.env.NEXT_PUBLIC_SITE_TAGLINE || 'Furniture, sofas & interiors for beautiful homes in Ghana.',
     site_logo: '/logo.png',
-    contact_email: process.env.NEXT_PUBLIC_CONTACT_EMAIL || 'hello@example.com',
-    contact_phone: process.env.NEXT_PUBLIC_CONTACT_PHONE || '+1 000 000 0000',
+    contact_email: process.env.NEXT_PUBLIC_CONTACT_EMAIL || 'hello@sikahomes.com',
+    contact_phone: process.env.NEXT_PUBLIC_CONTACT_PHONE || '',
     contact_whatsapp: process.env.NEXT_PUBLIC_CONTACT_WHATSAPP || process.env.NEXT_PUBLIC_CONTACT_PHONE || '',
-    contact_address: process.env.NEXT_PUBLIC_CONTACT_ADDRESS || '',
+    contact_address: process.env.NEXT_PUBLIC_CONTACT_ADDRESS || 'Ghana',
     social_facebook: '',
     social_instagram: '',
     social_twitter: '',

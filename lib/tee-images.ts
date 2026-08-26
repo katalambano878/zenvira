@@ -1,7 +1,11 @@
-/** Storefront imagery — product catalog */
+/** Placeholder image paths — furniture catalog uses category/product uploads instead. */
+export const FURNITURE_IMAGES = {
+  roomFallback: '/logo.png',
+} as const;
+
+/** @deprecated tee branding removed — kept for any residual imports */
 export const TEE_IMAGES = {
-  heroFlatLay: '/hero-fashion-bg.jpg',
-  heroGraphic: '/hero-tee-graphic.jpg',
-  heroPolo: '/hero-tee-polo.jpg',
-  categoryStrip: '/categories/shop-by-category-strip.png',
+  heroFlatLay: FURNITURE_IMAGES.roomFallback,
+  heroGraphic: FURNITURE_IMAGES.roomFallback,
+  heroPolo: FURNITURE_IMAGES.roomFallback,
 } as const;

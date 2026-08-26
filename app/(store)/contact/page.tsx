@@ -60,7 +60,7 @@ export default function ContactPage() {
   };
 
   // Get contact details from CMS settings
-  const contactEmail = getSetting('contact_email') || process.env.NEXT_PUBLIC_CONTACT_EMAIL || 'hello@example.com';
+  const contactEmail = getSetting('contact_email') || process.env.NEXT_PUBLIC_CONTACT_EMAIL || 'hello@sikahomes.com';
   const contactPhone = getSetting('contact_phone') || process.env.NEXT_PUBLIC_CONTACT_PHONE || '';
   const contactWhatsapp = getSetting('contact_whatsapp') || process.env.NEXT_PUBLIC_CONTACT_WHATSAPP || process.env.NEXT_PUBLIC_CONTACT_PHONE || '';
   const contactAddress = sanitizeAddressDisplay(
@@ -71,8 +71,8 @@ export default function ContactPage() {
   const ytHandle = getSocialYoutubeHandle();
   const scHandle = getSocialSnapchatHandle();
 
-  const heroTitle = 'Get In Touch';
-  const heroSubtitle = 'Have a question or need assistance?';
+  const heroTitle = 'Contact Sika Homes';
+  const heroSubtitle = 'Furniture questions, delivery quotes, or WhatsApp help choosing a piece.';
 
   const waNumber = (contactWhatsapp || '').replace(/[^0-9]/g, '');
   const waLink = waNumber ? (waNumber.startsWith('0') ? `https://wa.me/233${waNumber.slice(1)}` : `https://wa.me/${waNumber}`) : '#';

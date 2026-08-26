@@ -6,10 +6,11 @@ import ProductCard, { type ColorVariant, getColorHex } from '@/components/Produc
 import ProductCardSkeleton from '@/components/skeletons/ProductCardSkeleton';
 import AnimatedSection, { AnimatedGrid } from '@/components/AnimatedSection';
 import NewsletterSection from '@/components/NewsletterSection';
+import WhoWeAreSection from '@/components/WhoWeAreSection';
 import { usePageTitle } from '@/hooks/usePageTitle';
-import { getSiteName, getSiteTagline } from '@/lib/site-defaults';
+import { getDefaultRoomCategories, getSiteName, getSiteTagline } from '@/lib/site-defaults';
 
-const HOME_CATEGORY_TINTS = ['bg-slate-800', 'bg-stone-800', 'bg-zinc-800', 'bg-neutral-800', 'bg-gray-800', 'bg-slate-900', 'bg-stone-900', 'bg-zinc-900'];
+const ROOM_FALLBACKS = getDefaultRoomCategories();
 
 export default function Home() {
   usePageTitle('');
@@ -17,8 +18,8 @@ export default function Home() {
   const tagline = getSiteTagline();
   const [featuredProducts, setFeaturedProducts] = useState<any[]>([]);
   const [homeCategories, setHomeCategories] = useState<
-    { id: string; name: string; display_name: string; slug: string; subtitle: string; image: string; tint: string }[]
-  >([]);
+    { id: string; name: string; display_name: string; slug: string; subtitle: string; image?: string; tint: string }[]
+  >([...ROOM_FALLBACKS]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -39,10 +40,9 @@ export default function Home() {
           if (Array.isArray(catRows) && catRows.length) {
             const featured = catRows.filter(
               (c: { metadata?: { featured?: boolean }; image_url?: string }) =>
-                c.metadata?.featured === true && c.image_url
+                c.metadata?.featured === true
             );
-            const withImage = catRows.filter((c: { image_url?: string }) => c.image_url);
-            const source = featured.length > 0 ? featured : withImage;
+            const source = featured.length > 0 ? featured : catRows;
             setHomeCategories(
               source.slice(0, 8).map((c: any, i: number) => ({
                 id: c.id,
@@ -52,13 +52,11 @@ export default function Home() {
                 subtitle:
                   (c.description || '').trim().slice(0, 120) ||
                   c.metadata?.subtitle ||
-                  'Browse this collection',
-                image: c.image_url as string,
-                tint: HOME_CATEGORY_TINTS[i % HOME_CATEGORY_TINTS.length],
+                  'Shop this room',
+                image: c.image_url as string | undefined,
+                tint: ROOM_FALLBACKS[i % ROOM_FALLBACKS.length].tint,
               }))
             );
-          } else {
-            setHomeCategories([]);
           }
         }
       } catch (error: unknown) {
@@ -74,96 +72,100 @@ export default function Home() {
 
   return (
     <main className="flex-col items-center justify-between min-h-screen">
-      {/* Hero — neutral starter composition */}
-      <section className="relative w-full min-h-[85vh] md:min-h-[92vh] overflow-hidden flex items-center">
+      {/* Hero — furniture / interiors composition */}
+      <section className="relative w-full min-h-[88vh] md:min-h-[94vh] overflow-hidden flex items-end md:items-center">
         <div
-          className="absolute inset-0 bg-gradient-to-br from-slate-900 via-slate-800 to-stone-700"
+          className="absolute inset-0 bg-[radial-gradient(ellipse_at_20%_20%,#3f3a32_0%,transparent_50%),radial-gradient(ellipse_at_80%_10%,#5c5346_0%,transparent_45%),linear-gradient(160deg,#1c1917_0%,#292524_45%,#44403c_100%)]"
           aria-hidden
         />
         <div
-          className="absolute inset-0 opacity-[0.07]"
+          className="absolute inset-0 opacity-[0.12]"
           style={{
             backgroundImage:
-              'radial-gradient(circle at 20% 30%, white 0.5px, transparent 0.5px), radial-gradient(circle at 80% 70%, white 0.5px, transparent 0.5px)',
-            backgroundSize: '48px 48px',
+              'linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px), linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px)',
+            backgroundSize: '72px 72px',
           }}
           aria-hidden
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-black/20" aria-hidden />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/25 to-transparent" aria-hidden />
 
-        <div className="relative z-10 w-full max-w-4xl mx-auto px-6 md:px-10 py-24 text-center">
-          <p className="font-serif text-4xl sm:text-5xl md:text-6xl text-white tracking-tight mb-6 drop-shadow-lg animate-fade-in-up">
+        <div className="relative z-10 w-full max-w-6xl mx-auto px-6 md:px-10 py-24 md:py-28">
+          <p className="font-serif text-5xl sm:text-6xl md:text-7xl text-white tracking-tight mb-5 drop-shadow-lg animate-fade-in-up">
             {siteName}
           </p>
-          <h1 className="text-2xl sm:text-3xl md:text-4xl font-light text-white/95 mb-5 leading-snug animate-fade-in-up" style={{ animationDelay: '80ms' }}>
-            Build something exceptional.
+          <h1 className="text-xl sm:text-2xl md:text-3xl font-light text-stone-100/95 mb-5 leading-snug max-w-2xl animate-fade-in-up" style={{ animationDelay: '80ms' }}>
+            Sofas, furniture & interiors for homes that feel complete.
           </h1>
-          <p className="text-base md:text-lg text-white/70 max-w-xl mx-auto mb-10 font-light leading-relaxed animate-fade-in-up" style={{ animationDelay: '160ms' }}>
-            This repository has been prepared as a clean foundation for a new digital product.
-            {tagline && tagline !== 'Build something exceptional.' ? ` ${tagline}` : ''}
+          <p className="text-base md:text-lg text-stone-300/90 max-w-xl mb-10 font-light leading-relaxed animate-fade-in-up" style={{ animationDelay: '160ms' }}>
+            {tagline} Browse by room, shop online with Mobile Money, and furnish with confidence.
           </p>
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 animate-fade-in-up" style={{ animationDelay: '240ms' }}>
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4 animate-fade-in-up" style={{ animationDelay: '240ms' }}>
             <Link
               href="/shop"
-              className="px-10 py-3.5 bg-white text-slate-900 rounded-lg font-medium text-base hover:bg-stone-100 transition-colors"
+              className="px-10 py-3.5 bg-amber-100 text-stone-900 rounded-md font-medium text-base hover:bg-white transition-colors text-center"
             >
-              Get Started
+              Shop Furniture
             </Link>
             <Link
-              href="/about"
-              className="px-10 py-3.5 border border-white/40 text-white rounded-lg font-medium text-base hover:bg-white/10 transition-colors"
+              href="/categories"
+              className="px-10 py-3.5 border border-white/35 text-white rounded-md font-medium text-base hover:bg-white/10 transition-colors text-center"
             >
-              Learn More
+              Shop by Room
             </Link>
           </div>
         </div>
       </section>
 
-      {/* Feature placeholders */}
-      <section className="py-20 md:py-28 bg-stone-50">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6">
-          <AnimatedSection className="text-center mb-14">
-            <h2 className="font-serif text-3xl sm:text-4xl text-gray-900 mb-3">A solid foundation</h2>
-            <p className="text-gray-600 max-w-lg mx-auto">
-              Reusable storefront, admin, and commerce modules — ready for your content.
-            </p>
-          </AnimatedSection>
+      <section className="py-16 md:py-20 bg-stone-100 border-b border-stone-200/80">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <AnimatedGrid className="grid grid-cols-1 md:grid-cols-3 gap-10 md:gap-12">
             {[
-              { title: 'Storefront', body: 'Shop, cart, checkout, and account flows you can brand and extend.' },
-              { title: 'Admin', body: 'Products, orders, customers, and content management out of the box.' },
-              { title: 'Integrations', body: 'Payments, email, and SMS hooks — configure when credentials are ready.' },
+              {
+                title: 'Room-ready ranges',
+                body: 'Sofas, beds, dining sets, décor and essentials organised by living room, bedroom, kitchen and more.',
+              },
+              {
+                title: 'Built for Ghana buyers',
+                body: 'Mobile-first shopping with secure Mobile Money checkout and WhatsApp support when you need a hand.',
+              },
+              {
+                title: 'Delivery for real furniture',
+                body: 'Large-item delivery and installation-friendly workflows so sofas and tables arrive ready for your space.',
+              },
             ].map((item) => (
-              <div key={item.title} className="text-center md:text-left">
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">{item.title}</h3>
-                <p className="text-gray-600 text-sm leading-relaxed">{item.body}</p>
+              <div key={item.title}>
+                <h3 className="font-serif text-xl text-stone-900 mb-2">{item.title}</h3>
+                <p className="text-stone-600 text-sm leading-relaxed">{item.body}</p>
               </div>
             ))}
           </AnimatedGrid>
         </div>
       </section>
 
-      {homeCategories.length > 0 && (
-        <section className="py-20 md:py-28 bg-white relative overflow-hidden">
-          <div className="max-w-[1400px] mx-auto px-4 sm:px-6">
-            <AnimatedSection className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-6">
-              <div>
-                <h2 className="font-serif text-4xl sm:text-5xl text-gray-900 leading-[1.1]">
-                  Shop by <span className="italic text-gray-400">Category</span>
-                </h2>
-              </div>
-              <Link
-                href="/categories"
-                className="group flex items-center justify-center w-14 h-14 rounded-full border border-gray-200 hover:border-gray-900 hover:bg-gray-900 hover:text-white transition-all duration-300"
-              >
-                <i className="ri-arrow-right-line text-xl transition-transform group-hover:translate-x-1"></i>
-              </Link>
-            </AnimatedSection>
+      <section className="py-20 md:py-28 bg-white relative overflow-hidden">
+        <div className="max-w-[1400px] mx-auto px-4 sm:px-6">
+          <AnimatedSection className="flex flex-col md:flex-row md:items-end justify-between mb-14 gap-6">
+            <div>
+              <h2 className="font-serif text-4xl sm:text-5xl text-stone-900 leading-[1.1]">
+                Shop by <span className="italic text-stone-400">room</span>
+              </h2>
+              <p className="text-stone-600 mt-3 max-w-lg">
+                Find sofas, beds, tables and décor by the spaces you are furnishing.
+              </p>
+            </div>
+            <Link
+              href="/categories"
+              className="group flex items-center justify-center w-14 h-14 rounded-full border border-stone-200 hover:border-stone-900 hover:bg-stone-900 hover:text-white transition-all duration-300"
+            >
+              <i className="ri-arrow-right-line text-xl transition-transform group-hover:translate-x-1"></i>
+            </Link>
+          </AnimatedSection>
 
-            <AnimatedGrid className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
-              {homeCategories.map((category) => (
-                <Link href={`/shop?category=${encodeURIComponent(category.slug)}`} key={category.id} className="group block h-full w-full">
-                  <div className="relative aspect-[3/4] overflow-hidden isolate bg-gray-900 shadow-xl rounded-2xl">
+          <AnimatedGrid className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+            {homeCategories.map((category) => (
+              <Link href={`/shop?category=${encodeURIComponent(category.slug)}`} key={category.id} className="group block h-full w-full">
+                <div className="relative aspect-[3/4] overflow-hidden isolate bg-stone-900 shadow-lg">
+                  {category.image ? (
                     <div className="absolute inset-0 transition-transform duration-[1500ms] ease-out group-hover:scale-110 opacity-90 group-hover:opacity-100">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img
@@ -172,33 +174,36 @@ export default function Home() {
                         className="absolute inset-0 h-full w-full object-cover"
                       />
                     </div>
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent opacity-80" />
-                    <div className={`absolute inset-0 ${category.tint} mix-blend-overlay opacity-40`} />
-                    <div className="absolute inset-0 p-8 flex flex-col justify-end z-10">
-                      <h3 className="font-serif text-3xl text-white leading-[0.9] mb-3 drop-shadow-xl">
-                        {category.display_name || category.name}
-                      </h3>
-                      <div className="h-[1px] w-12 bg-white/60 mb-4 transition-all duration-700 group-hover:w-full" />
-                      <p className="text-white/80 font-light text-sm tracking-widest uppercase opacity-0 group-hover:opacity-100 transition-opacity">
-                        {category.subtitle}
-                      </p>
-                    </div>
+                  ) : (
+                    <div className={`absolute inset-0 ${category.tint}`} />
+                  )}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/25 to-transparent opacity-90" />
+                  <div className="absolute inset-0 p-6 md:p-8 flex flex-col justify-end z-10">
+                    <h3 className="font-serif text-2xl md:text-3xl text-white leading-[0.95] mb-2 drop-shadow-xl">
+                      {category.display_name || category.name}
+                    </h3>
+                    <div className="h-px w-10 bg-amber-100/70 mb-3 transition-all duration-700 group-hover:w-full" />
+                    <p className="text-white/75 font-light text-xs tracking-widest uppercase">
+                      {category.subtitle}
+                    </p>
                   </div>
-                </Link>
-              ))}
-            </AnimatedGrid>
-          </div>
-        </section>
-      )}
+                </div>
+              </Link>
+            ))}
+          </AnimatedGrid>
+        </div>
+      </section>
+
+      <WhoWeAreSection />
 
       <section className="py-16 md:py-24 bg-stone-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <AnimatedSection className="text-center mb-16">
-            <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl text-gray-900 mb-4">Featured Products</h2>
-            <p className="text-gray-600 text-lg max-w-2xl mx-auto">
+          <AnimatedSection className="text-center mb-14">
+            <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl text-stone-900 mb-4">Featured pieces</h2>
+            <p className="text-stone-600 text-lg max-w-2xl mx-auto">
               {loading || featuredProducts.length > 0
-                ? 'Products marked as featured in admin appear here.'
-                : 'No products have been added yet. Configure the catalog in admin to begin.'}
+                ? 'Hand-picked sofas, furniture and décor from the Sika Homes catalog.'
+                : 'New furniture arrivals will appear here once products are added in admin.'}
             </p>
           </AnimatedSection>
 
@@ -209,10 +214,10 @@ export default function Home() {
               ))}
             </div>
           ) : featuredProducts.length === 0 ? (
-            <div className="text-center py-12 border border-dashed border-gray-300 rounded-xl bg-white/60">
-              <p className="text-gray-500 mb-6">No featured products yet.</p>
-              <Link href="/admin/products" className="text-sm font-medium text-slate-800 underline underline-offset-4">
-                Open admin catalog
+            <div className="text-center py-14 border border-dashed border-stone-300 bg-white/70">
+              <p className="text-stone-500 mb-6">No featured furniture yet — browse the full shop or check back soon.</p>
+              <Link href="/shop" className="text-sm font-medium text-stone-800 underline underline-offset-4">
+                Browse all furniture
               </Link>
             </div>
           ) : (
@@ -264,9 +269,9 @@ export default function Home() {
           <div className="text-center mt-16">
             <Link
               href="/shop"
-              className="inline-flex items-center justify-center bg-gray-900 text-white px-10 py-4 rounded-lg font-medium hover:bg-slate-800 transition-all"
+              className="inline-flex items-center justify-center bg-stone-900 text-white px-10 py-4 rounded-md font-medium hover:bg-stone-800 transition-all"
             >
-              View All Products
+              View all furniture
             </Link>
           </div>
         </div>

@@ -19,7 +19,7 @@ export default function Header() {
   const { cartCount, isCartOpen, setIsCartOpen } = useCart();
   const { getSetting } = useCMS();
 
-  const siteName = getSetting('site_name') || (process.env.NEXT_PUBLIC_SITE_NAME || 'New Project');
+  const siteName = getSetting('site_name') || (process.env.NEXT_PUBLIC_SITE_NAME || 'Sika Homes');
   const wordmark = getWordmark();
 
   useEffect(() => {
