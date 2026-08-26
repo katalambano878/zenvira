@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import Link from 'next/link';
 import { useState } from 'react';
@@ -14,19 +14,18 @@ import {
   getDefaultSocialLinks,
 } from '@/lib/site-defaults';
 
-function FooterSection({ title, children }: { title: string, children: React.ReactNode }) {
+function FooterSection({ title, children }: { title: string; children: React.ReactNode }) {
   const [isOpen, setIsOpen] = useState(false);
-
   return (
-    <div className="border-b border-blue-800/50 lg:border-none last:border-0">
+    <div className="border-b border-stone-200 lg:border-none last:border-0">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full flex items-center justify-between py-4 text-left lg:py-0 lg:cursor-default lg:mb-6"
+        className="w-full flex items-center justify-between py-4 text-left lg:py-0 lg:cursor-default lg:mb-5"
       >
-        <h4 className="font-bold text-lg text-white">{title}</h4>
-        <i className={`ri-arrow-down-s-line text-blue-400 text-xl transition-transform duration-300 lg:hidden ${isOpen ? 'rotate-180' : ''}`}></i>
+        <h4 className="font-serif text-lg text-store-ink">{title}</h4>
+        <i className={`ri-arrow-down-s-line text-store-muted lg:hidden transition-transform ${isOpen ? 'rotate-180' : ''}`} />
       </button>
-      <div className={`overflow-hidden transition-all duration-300 ${isOpen ? 'max-h-96 pb-6' : 'max-h-0 lg:max-h-full lg:overflow-visible'}`}>
+      <div className={`overflow-hidden transition-all ${isOpen ? 'max-h-96 pb-5' : 'max-h-0 lg:max-h-none'}`}>
         {children}
       </div>
     </div>
@@ -35,114 +34,112 @@ function FooterSection({ title, children }: { title: string, children: React.Rea
 
 export default function Footer() {
   const { getSetting } = useCMS();
-
   const siteName = getSetting('site_name') || getSiteName();
   const siteTagline = getSetting('site_tagline') || getSiteTagline();
   const contactEmail = getSetting('contact_email') || getContactEmail();
   const contactPhone = getSetting('contact_phone') || getContactPhoneDisplay();
-  const contactWhatsapp = getSetting('contact_whatsapp') || process.env.NEXT_PUBLIC_CONTACT_WHATSAPP || getContactPhoneDisplay();
-  const contactAddress = sanitizeAddressDisplay(
-    getSetting('contact_address') || getContactAddress()
-  );
+  const contactWhatsapp =
+    getSetting('contact_whatsapp') || process.env.NEXT_PUBLIC_CONTACT_WHATSAPP || getContactPhoneDisplay();
+  const contactAddress = sanitizeAddressDisplay(getSetting('contact_address') || getContactAddress());
   const wordmark = getSetting('wordmark') || getWordmark();
   const socialDefaults = getDefaultSocialLinks();
-  const socialFacebook = getSetting('social_facebook') || '';
   const socialInstagram = getSetting('social_instagram') || socialDefaults.instagram;
-  const socialTwitter = getSetting('social_twitter') || '';
-  const socialTiktok = getSetting('social_tiktok') || '';
-  const socialSnapchat = getSetting('social_snapchat') || socialDefaults.snapchat;
+  const socialFacebook = getSetting('social_facebook') || '';
   const socialYoutube = getSetting('social_youtube') || socialDefaults.youtube;
 
+  const waDigits = (contactWhatsapp || '').replace(/\D/g, '');
+  const chatHref = waDigits
+    ? `https://wa.me/${waDigits.startsWith('0') ? `233${waDigits.slice(1)}` : waDigits}`
+    : '/contact';
+
   return (
-    <footer className="relative mt-12 z-0">
-
-      {/* Footer Background Shape */}
-      <div className="absolute inset-0 bg-blue-950 rounded-t-[3rem] -z-10 overflow-hidden">
-        {/* Decorative elements inside footer bg */}
-        <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-blue-800 to-transparent opacity-30"></div>
-      </div>
-
-      <div className="text-white pt-16 pb-12">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12">
-
-            {/* Brand Column */}
-            <div className="lg:col-span-1 space-y-6">
-              <Link href="/" className="inline-block group" aria-label={`${wordmark} — home`}>
-                <span className="font-['Pacifico'] text-4xl sm:text-5xl text-white drop-shadow-lg group-hover:scale-105 transition-transform duration-300 inline-block origin-left">
-                  {wordmark}
-                </span>
-              </Link>
-              <p className="text-blue-200/60 leading-relaxed text-sm">
-                {[siteTagline, contactAddress || null, contactPhone ? `Tel: ${contactPhone}` : null, (contactWhatsapp && contactWhatsapp !== contactPhone) ? `WhatsApp: ${contactWhatsapp}` : null].filter(Boolean).join(' · ') || `${siteTagline}.`}
+    <footer className="bg-store-sand border-t border-stone-200/80 mt-8">
+      <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-10 pt-16 pb-10">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-8">
+          <div className="lg:col-span-4 space-y-5">
+            <Link href="/" className="inline-block">
+              <span className="font-serif text-2xl tracking-[0.06em] uppercase text-store-ink">{wordmark}</span>
+            </Link>
+            <p className="text-sm text-store-muted leading-relaxed max-w-sm">{siteTagline}</p>
+            {(contactAddress || contactPhone || contactEmail) && (
+              <p className="text-sm text-store-muted leading-relaxed">
+                {[contactAddress, contactPhone, contactEmail].filter(Boolean).join(' · ')}
               </p>
-
-              <div className="flex flex-wrap gap-3 pt-2">
-                {[
-                  { link: socialInstagram, icon: 'ri-instagram-line', label: 'Instagram' },
-                  { link: socialYoutube, icon: 'ri-youtube-fill', label: 'YouTube' },
-                  { link: socialSnapchat, icon: 'ri-snapchat-fill', label: 'Snapchat' },
-                  { link: socialTiktok, icon: 'ri-tiktok-fill', label: 'TikTok' },
-                  { link: socialTwitter, icon: 'ri-twitter-x-fill', label: 'X' },
-                  { link: socialFacebook, icon: 'ri-facebook-fill', label: 'Facebook' }
-                ].map((social, i) => social.link && (
-                  <a
-                    key={i}
-                    href={social.link}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    aria-label={social.label}
-                    className="w-10 h-10 bg-blue-900/40 border border-blue-800 rounded-full flex items-center justify-center text-blue-300 hover:bg-blue-500 hover:text-blue-950 hover:border-blue-500 transition-all hover:-translate-y-1"
-                  >
-                    <i className={social.icon}></i>
-                  </a>
-                ))}
-              </div>
-            </div>
-
-            {/* Links Sections */}
-            <div className="lg:col-span-3 grid md:grid-cols-3 gap-8 lg:gap-12 pl-0 lg:pl-12">
-
-              <div className="space-y-6">
-                <h4 className="font-serif text-xl font-bold text-white">Shop</h4>
-                <ul className="space-y-3 text-blue-100/60 text-sm">
-                  <li><Link href="/shop" className="hover:text-blue-300 transition-colors">All Products</Link></li>
-                  <li><Link href="/categories" className="hover:text-blue-300 transition-colors">Collections</Link></li>
-                  <li><Link href="/shop?sort=newest" className="hover:text-blue-300 transition-colors">New Arrivals</Link></li>
-                  <li><Link href="/shop?sort=bestsellers" className="hover:text-blue-300 transition-colors">Best Sellers</Link></li>
-                </ul>
-              </div>
-
-              <div className="space-y-6">
-                <h4 className="font-serif text-xl font-bold text-white">Support</h4>
-                <ul className="space-y-3 text-blue-100/60 text-sm">
-                  <li><Link href="/contact" className="hover:text-blue-300 transition-colors">Contact Us</Link></li>
-                  <li><Link href="/order-tracking" className="hover:text-blue-300 transition-colors">Track Order</Link></li>
-                  <li><Link href="/shipping" className="hover:text-blue-300 transition-colors">Shipping & Delivery</Link></li>
-                  <li><Link href="/returns" className="hover:text-blue-300 transition-colors">Returns & Exchange</Link></li>
-                </ul>
-              </div>
-
-              <div className="space-y-6">
-                <h4 className="font-serif text-xl font-bold text-white">Company</h4>
-                <ul className="space-y-3 text-blue-100/60 text-sm">
-                  <li><Link href="/about" className="hover:text-blue-300 transition-colors">Our Story</Link></li>
-                  <li><Link href="/privacy" className="hover:text-blue-300 transition-colors">Privacy Policy</Link></li>
-                  <li><Link href="/terms" className="hover:text-blue-300 transition-colors">Terms of Service</Link></li>
-                  <li><Link href="/admin" className="hover:text-blue-300 transition-colors">Admin Access</Link></li>
-                </ul>
-              </div>
-
+            )}
+            <div className="flex gap-3 pt-1">
+              {[
+                { link: socialInstagram, icon: 'ri-instagram-line', label: 'Instagram' },
+                { link: socialFacebook, icon: 'ri-facebook-fill', label: 'Facebook' },
+                { link: socialYoutube, icon: 'ri-youtube-fill', label: 'YouTube' },
+              ].map(
+                (s) =>
+                  s.link && (
+                    <a
+                      key={s.label}
+                      href={s.link}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label={s.label}
+                      className="w-10 h-10 rounded-full border border-stone-300 flex items-center justify-center text-store-ink hover:bg-store-sage hover:text-white hover:border-store-sage transition-colors"
+                    >
+                      <i className={s.icon} />
+                    </a>
+                  )
+              )}
             </div>
           </div>
 
-          <div className="border-t border-blue-900/50 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-blue-500/40">
-            <p>&copy; {new Date().getFullYear()} {siteName}. All rights reserved.</p>
-            <div className="flex gap-4 opacity-40">
-              <i className="ri-visa-line text-2xl"></i>
-              <i className="ri-mastercard-line text-2xl"></i>
-              <i className="ri-paypal-line text-2xl"></i>
+          <div className="lg:col-span-6 grid sm:grid-cols-3 gap-6">
+            <FooterSection title="Shop">
+              <ul className="space-y-2.5 text-sm text-store-muted">
+                <li><Link href="/shop" className="hover:text-store-ink">All furniture</Link></li>
+                <li><Link href="/shop?category=sofas" className="hover:text-store-ink">Sofas</Link></li>
+                <li><Link href="/shop?category=bedroom" className="hover:text-store-ink">Bedroom</Link></li>
+                <li><Link href="/shop?category=dining" className="hover:text-store-ink">Dining</Link></li>
+              </ul>
+            </FooterSection>
+            <FooterSection title="Rooms">
+              <ul className="space-y-2.5 text-sm text-store-muted">
+                <li><Link href="/shop?category=living-room" className="hover:text-store-ink">Living room</Link></li>
+                <li><Link href="/shop?category=kitchen" className="hover:text-store-ink">Kitchen</Link></li>
+                <li><Link href="/shop?category=office" className="hover:text-store-ink">Office</Link></li>
+                <li><Link href="/shop?category=outdoor" className="hover:text-store-ink">Outdoor</Link></li>
+              </ul>
+            </FooterSection>
+            <FooterSection title="Help">
+              <ul className="space-y-2.5 text-sm text-store-muted">
+                <li><Link href="/shipping" className="hover:text-store-ink">Delivery</Link></li>
+                <li><Link href="/returns" className="hover:text-store-ink">Returns</Link></li>
+                <li><Link href="/order-tracking" className="hover:text-store-ink">Track order</Link></li>
+                <li><Link href="/faqs" className="hover:text-store-ink">FAQs</Link></li>
+              </ul>
+            </FooterSection>
+          </div>
+
+          <div className="lg:col-span-2">
+            <div className="rounded-2xl bg-white border border-stone-200 p-5 shadow-soft">
+              <p className="font-serif text-lg text-store-ink mb-1">Need help?</p>
+              <p className="text-xs text-store-muted mb-4 leading-relaxed">
+                Ask about sofas, dimensions, or delivery across Ghana.
+              </p>
+              <Link
+                href={chatHref}
+                target={waDigits ? '_blank' : undefined}
+                rel={waDigits ? 'noopener noreferrer' : undefined}
+                className="inline-flex w-full items-center justify-center rounded-full bg-store-sage px-4 py-2.5 text-xs font-medium text-white hover:bg-store-sageDark transition-colors"
+              >
+                Start a chat
+              </Link>
             </div>
+          </div>
+        </div>
+
+        <div className="mt-12 pt-6 border-t border-stone-300/60 flex flex-col sm:flex-row justify-between gap-3 text-xs text-store-muted">
+          <p>© {new Date().getFullYear()} {siteName}. All rights reserved.</p>
+          <div className="flex gap-4">
+            <Link href="/privacy" className="hover:text-store-ink">Privacy</Link>
+            <Link href="/terms" className="hover:text-store-ink">Terms</Link>
+            <Link href="/about" className="hover:text-store-ink">About</Link>
           </div>
         </div>
       </div>

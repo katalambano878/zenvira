@@ -5,26 +5,34 @@ module.exports = {
     extend: {
       fontFamily: {
         sans: ['Outfit', 'sans-serif'],
-        serif: ['"Playfair Display"', 'serif'],
+        serif: ['"Playfair Display"', 'Georgia', 'serif'],
         handwriting: ['Pacifico', 'cursive'],
       },
       colors: {
         brand: {
-          DEFAULT: '#2563eb',
-          light: '#3b82f6',
-          dark: '#1e40af',
-          accent: '#38bdf8',
-          muted: '#93c5fd',
+          DEFAULT: '#535C4E',
+          light: '#6B7564',
+          dark: '#3F463A',
+          accent: '#8A947C',
+          muted: '#C5CBBE',
         },
         store: {
-          navy: '#0f172a',
-          primary: '#2563eb',
-          accent: '#64748b',
-          muted: '#6b7280',
+          cream: '#F7F5F0',
+          sand: '#EFEBE3',
+          ink: '#1A1A1A',
+          sage: '#535C4E',
+          sageDark: '#3F463A',
+          muted: '#6B6B6B',
         },
+      },
+      borderRadius: {
+        '2.5xl': '1.25rem',
+        '4xl': '2rem',
+      },
+      boxShadow: {
+        soft: '0 12px 40px rgba(26, 26, 26, 0.08)',
       },
     },
   },
   plugins: [],
-}
-
+};

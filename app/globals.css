@@ -3,6 +3,21 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --sika-cream: #f7f5f0;
+  --sika-sand: #efebe3;
+  --sika-ink: #1a1a1a;
+  --sika-sage: #535c4e;
+  --sika-sage-dark: #3f463a;
+  --sika-muted: #6b6b6b;
+}
+
+@layer base {
+  body {
+    @apply bg-store-cream text-store-ink font-sans antialiased;
+  }
+}
+
 /* ========================================
    ANIMATIONS & EFFECTS
    ======================================== */

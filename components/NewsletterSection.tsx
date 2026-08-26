@@ -1,8 +1,7 @@
-"use client";
+'use client';
 
 import { useState } from 'react';
 
-// Newsletter Component
 export default function NewsletterSection() {
   const [email, setEmail] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -12,13 +11,16 @@ export default function NewsletterSection() {
     e.preventDefault();
     setIsSubmitting(true);
     setSubmitStatus('idle');
-
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      const res = await fetch('/api/newsletter/subscribe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      });
+      if (!res.ok) throw new Error('subscribe failed');
       setSubmitStatus('success');
       setEmail('');
-    } catch (error) {
+    } catch {
       setSubmitStatus('error');
     } finally {
       setIsSubmitting(false);
@@ -26,68 +28,37 @@ export default function NewsletterSection() {
   };
 
   return (
-    <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 mb-12">
-      <div className="bg-[#0c1929] rounded-[2rem] overflow-hidden shadow-2xl relative">
-
-        {/* Background Image / Texture */}
-        <div className="absolute inset-0 opacity-20">
-          <div className="absolute -top-40 -right-40 w-96 h-96 bg-sky-400 rounded-full blur-[100px] opacity-30"></div>
-          <div className="absolute top-40 -left-20 w-72 h-72 bg-sky-300 rounded-full blur-[100px] opacity-20"></div>
-        </div>
-
-        <div className="relative z-10 flex flex-col lg:flex-row items-center justify-between p-8 md:p-10 lg:p-12 gap-8">
-
-          {/* Left Content */}
-          <div className="text-center lg:text-left max-w-xl">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-900/50 border border-blue-500/30 text-blue-300 text-xs font-bold tracking-widest uppercase mb-4 animate-pulse-glow">
-              <span className="w-2 h-2 rounded-full bg-sky-400"></span>
-              The Insider Club
-            </div>
-
-            <h3 className="text-3xl md:text-4xl font-serif text-white mb-4 leading-tight">
-              New arrivals for <span className="italic text-amber-200">your home</span>
-            </h3>
-
-            <p className="text-stone-200/90 text-base leading-relaxed">
-              Get sofa restocks, dining sets and décor drops from Sika Homes — plus occasional offers for Ghana shoppers.
-            </p>
-          </div>
-
-          {/* Right Form */}
-          <div className="w-full max-w-md bg-white/5 backdrop-blur-md p-1.5 rounded-2xl border border-white/10 pwa-submit-form">
-            <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-2">
-              <input
-                type="email"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="Enter your email"
-                className="flex-1 bg-transparent border-none text-white placeholder-white/40 px-5 py-3 focus:ring-0 text-base"
-              />
-              <button
-                type="submit"
-                disabled={isSubmitting}
-                className="bg-sky-400 hover:bg-blue-400 text-blue-950 font-bold px-6 py-3 rounded-xl transition-all hover:scale-105 active:scale-95 disabled:opacity-75 disabled:cursor-not-allowed shadow-lg whitespace-nowrap text-sm"
-              >
-                {isSubmitting ? (
-                  <i className="ri-loader-4-line animate-spin text-lg"></i>
-                ) : (
-                  <span className="flex items-center gap-2">
-                    Join <i className="ri-arrow-right-line"></i>
-                  </span>
-                )}
-              </button>
-            </form>
-          </div>
-
-        </div>
-
-        {submitStatus === 'success' && (
-          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-sky-400 text-blue-950 px-6 py-2 rounded-full font-bold shadow-lg animate-in fade-in slide-in-from-bottom-2">
-            <i className="ri-checkbox-circle-line mr-2"></i> Welcome to the club!
-          </div>
-        )}
-      </div>
+    <div className="rounded-[2rem] bg-store-sand border border-stone-200/80 px-6 sm:px-10 py-12 md:py-14 text-center">
+      <p className="text-xs tracking-[0.2em] uppercase text-store-muted mb-3">Stay inspired</p>
+      <h3 className="font-serif text-3xl sm:text-4xl text-store-ink mb-3">
+        Get 10% off your first order
+      </h3>
+      <p className="text-store-muted text-sm max-w-md mx-auto mb-8 leading-relaxed">
+        New sofas, room looks and delivery tips for furnishing your Ghana home — straight to your inbox.
+      </p>
+      <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-3 max-w-lg mx-auto">
+        <input
+          type="email"
+          required
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          placeholder="Enter your email"
+          className="flex-1 rounded-full border border-stone-300 bg-white px-5 py-3.5 text-sm focus:outline-none focus:ring-2 focus:ring-store-sage/25 focus:border-store-sage"
+        />
+        <button
+          type="submit"
+          disabled={isSubmitting}
+          className="rounded-full bg-store-sage px-7 py-3.5 text-sm font-medium text-white hover:bg-store-sageDark transition-colors disabled:opacity-60"
+        >
+          {isSubmitting ? 'Subscribing…' : 'Subscribe'}
+        </button>
+      </form>
+      {submitStatus === 'success' && (
+        <p className="mt-4 text-sm text-store-sage">You&apos;re on the list — thank you.</p>
+      )}
+      {submitStatus === 'error' && (
+        <p className="mt-4 text-sm text-red-700">Something went wrong. Please try again.</p>
+      )}
     </div>
   );
 }
