@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import PageHero from '@/components/PageHero';
+import { PAGE_HEROES } from '@/lib/furniture-images';
 
 function formatDate(date: string | null) {
   if (!date) return '';
@@ -45,7 +46,7 @@ export default function BlogPage() {
     id: post.id,
     title: post.title,
     excerpt: post.excerpt || '',
-    image: post.featured_image || '/logo.png',
+    image: post.featured_image || PAGE_HEROES.blog,
     category: post.tags?.[0] || 'General',
     date: formatDate(post.published_at),
     readTime: '—',
@@ -60,7 +61,7 @@ export default function BlogPage() {
       <PageHero
         title="Our Blog"
         subtitle="Articles and updates from our team. Publish posts in the admin to populate this page."
-        backgroundImage="/logo.png"
+        backgroundImage={PAGE_HEROES.blog}
       />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
@@ -75,7 +76,7 @@ export default function BlogPage() {
             </p>
             <Link
               href="/shop"
-              className="inline-flex items-center gap-2 bg-blue-700 text-white px-6 py-3 rounded-full font-medium hover:bg-blue-800 transition-colors"
+              className="inline-flex items-center gap-2 bg-store-gold text-white px-6 py-3 rounded-full font-medium hover:bg-store-goldDark transition-colors"
             >
               Browse the shop
               <i className="ri-arrow-right-line"></i>
@@ -94,7 +95,7 @@ export default function BlogPage() {
                         className="w-full h-full object-cover"
                       />
                       <div className="absolute top-6 left-6">
-                        <span className="bg-blue-700 text-white px-4 py-2 rounded-full text-sm font-medium">
+                        <span className="bg-store-gold text-white px-4 py-2 rounded-full text-sm font-medium">
                           Featured
                         </span>
                       </div>
@@ -113,8 +114,8 @@ export default function BlogPage() {
                         {featuredPost.excerpt}
                       </p>
                       <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-                          <i className="ri-user-line text-blue-700"></i>
+                        <div className="w-10 h-10 bg-store-gold/15 rounded-full flex items-center justify-center">
+                          <i className="ri-user-line text-store-gold"></i>
                         </div>
                         <span className="text-gray-900 font-medium">{featuredPost.author}</span>
                       </div>

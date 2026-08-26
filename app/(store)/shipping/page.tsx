@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import PageHero from '@/components/PageHero';
+import { PAGE_HEROES } from '@/lib/furniture-images';
 
 export default function ShippingPage() {
   const deliveryOptions = [
@@ -52,12 +53,12 @@ export default function ShippingPage() {
       <PageHero
         title="Shipping & Delivery"
         subtitle="Large-item delivery for sofas, beds and furniture across Ghana — planned, not left at the gate."
-        backgroundImage="/logo.png"
+        backgroundImage={PAGE_HEROES.shipping}
       />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <div className="mb-16 max-w-3xl mx-auto text-center">
-          <p className="text-stone-600 text-lg leading-relaxed">
+          <p className="text-store-muted text-lg leading-relaxed">
             Furniture needs careful handling. After you pay, we confirm stock, pack securely, and schedule
             delivery or pickup. Dimensions, stair access and installation needs can be discussed on WhatsApp
             before dispatch.
@@ -65,30 +66,30 @@ export default function ShippingPage() {
         </div>
 
         <div className="mb-16">
-          <h2 className="text-3xl font-serif text-stone-900 mb-8 text-center">Delivery options</h2>
+          <h2 className="text-3xl font-serif text-store-ink mb-8 text-center">Delivery options</h2>
           <div className="grid md:grid-cols-3 gap-6">
             {deliveryOptions.map((option) => (
               <div
                 key={option.type}
-                className="bg-white border border-stone-200 p-8 hover:border-stone-800 hover:shadow-lg transition-all"
+                className="bg-white border border-store-ink/10 p-8 hover:border-store-gold hover:shadow-lg transition-all"
               >
-                <div className="w-14 h-14 bg-stone-100 flex items-center justify-center mb-6">
-                  <i className={`${option.icon} text-2xl text-stone-800`}></i>
+                <div className="w-14 h-14 bg-black/[0.04] flex items-center justify-center mb-6">
+                  <i className={`${option.icon} text-2xl text-store-ink`}></i>
                 </div>
-                <h3 className="text-xl font-semibold text-stone-900 mb-2">{option.type}</h3>
-                <div className="text-amber-800 font-semibold text-lg mb-2">{option.cost}</div>
-                <div className="text-stone-600 font-medium mb-4">{option.time}</div>
-                <p className="text-stone-600 leading-relaxed text-sm">{option.description}</p>
+                <h3 className="text-xl font-semibold text-store-ink mb-2">{option.type}</h3>
+                <div className="text-store-goldDark font-semibold text-lg mb-2">{option.cost}</div>
+                <div className="text-store-muted font-medium mb-4">{option.time}</div>
+                <p className="text-store-muted leading-relaxed text-sm">{option.description}</p>
               </div>
             ))}
           </div>
         </div>
 
         <div className="mb-16">
-          <h2 className="text-3xl font-serif text-stone-900 mb-8">Delivery zones & timeframes</h2>
-          <div className="overflow-x-auto border border-stone-200">
+          <h2 className="text-3xl font-serif text-store-ink mb-8">Delivery zones & timeframes</h2>
+          <div className="overflow-x-auto border border-store-ink/10">
             <table className="w-full text-left text-sm">
-              <thead className="bg-stone-900 text-white">
+              <thead className="bg-store-ink text-white">
                 <tr>
                   <th className="px-4 py-3 font-medium">Zone</th>
                   <th className="px-4 py-3 font-medium">Areas</th>
@@ -98,11 +99,11 @@ export default function ShippingPage() {
               </thead>
               <tbody>
                 {zones.map((z) => (
-                  <tr key={z.zone} className="border-t border-stone-200">
-                    <td className="px-4 py-4 font-medium text-stone-900">{z.zone}</td>
-                    <td className="px-4 py-4 text-stone-600">{z.areas}</td>
-                    <td className="px-4 py-4 text-stone-700">{z.standard}</td>
-                    <td className="px-4 py-4 text-stone-700">{z.express}</td>
+                  <tr key={z.zone} className="border-t border-store-ink/10">
+                    <td className="px-4 py-4 font-medium text-store-ink">{z.zone}</td>
+                    <td className="px-4 py-4 text-store-muted">{z.areas}</td>
+                    <td className="px-4 py-4 text-store-ink/80">{z.standard}</td>
+                    <td className="px-4 py-4 text-store-ink/80">{z.express}</td>
                   </tr>
                 ))}
               </tbody>
@@ -110,9 +111,9 @@ export default function ShippingPage() {
           </div>
         </div>
 
-        <div className="bg-stone-50 border border-stone-200 p-8 md:p-10 mb-12">
-          <h2 className="text-2xl font-serif text-stone-900 mb-4">Before we deliver</h2>
-          <ul className="space-y-3 text-stone-600">
+        <div className="bg-white border border-store-ink/10 p-8 md:p-10 mb-12">
+          <h2 className="text-2xl font-serif text-store-ink mb-4">Before we deliver</h2>
+          <ul className="space-y-3 text-store-muted">
             <li>Measure doorways, stairwells and lift size for sofas and beds.</li>
             <li>Share access notes (floor, gate code, landmark) at checkout.</li>
             <li>Someone 18+ should be present to receive and inspect large items.</li>
@@ -123,7 +124,7 @@ export default function ShippingPage() {
         <div className="text-center">
           <Link
             href="/contact"
-            className="inline-flex items-center gap-2 bg-stone-900 text-white px-8 py-3.5 font-medium hover:bg-stone-800 transition-colors"
+            className="inline-flex items-center gap-2 bg-store-ink text-white px-8 py-3.5 font-medium hover:bg-store-ink transition-colors"
           >
             Ask about delivery to your area
             <i className="ri-arrow-right-line"></i>

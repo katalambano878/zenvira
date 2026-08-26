@@ -51,7 +51,7 @@ export default function CustomerDetailsPage() {
                     <Link href="/admin/customers" className="p-2 hover:bg-gray-100 rounded-lg text-gray-500 transition-colors">
                         <i className="ri-arrow-left-line text-xl"></i>
                     </Link>
-                    <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center text-blue-700 text-2xl font-bold">
+                    <div className="w-16 h-16 bg-store-gold/15 rounded-full flex items-center justify-center text-store-gold text-2xl font-bold">
                         {customer.full_name?.charAt(0) || customer.email.charAt(0).toUpperCase()}
                     </div>
                     <div>
@@ -103,7 +103,7 @@ export default function CustomerDetailsPage() {
                         <tbody className="divide-y divide-gray-100">
                             {orders.map((order) => (
                                 <tr key={order.id} className="hover:bg-gray-50">
-                                    <td className="px-6 py-4 text-sm font-medium text-blue-700">
+                                    <td className="px-6 py-4 text-sm font-medium text-store-gold">
                                         <Link href={`/admin/orders/${order.id}`}>#{order.id.slice(0, 8)}</Link>
                                     </td>
                                     <td className="px-6 py-4 text-sm text-gray-600">
@@ -116,7 +116,7 @@ export default function CustomerDetailsPage() {
                                     </td>
                                     <td className="px-6 py-4 text-sm font-bold text-gray-900">GH₵{money(order.total)}</td>
                                     <td className="px-6 py-4 text-right">
-                                        <Link href={`/admin/orders/${order.id}`} className="text-gray-400 hover:text-blue-700">
+                                        <Link href={`/admin/orders/${order.id}`} className="text-gray-400 hover:text-store-gold">
                                             <i className="ri-eye-line text-lg"></i>
                                         </Link>
                                     </td>

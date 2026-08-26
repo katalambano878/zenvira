@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import PageHero from '@/components/PageHero';
+import { PAGE_HEROES } from '@/lib/furniture-images';
 import { getSiteName } from '@/lib/site-defaults';
 
 export default function FAQsPage() {
@@ -128,11 +129,11 @@ export default function FAQsPage() {
       <PageHero
         title="Frequently Asked Questions"
         subtitle="Orders, furniture sizing, delivery of large pieces, payments and returns."
-        backgroundImage="/logo.png"
+        backgroundImage={PAGE_HEROES.support}
       />
 
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 -mt-16 relative z-20 pb-8">
-        <div className="relative bg-white rounded-full shadow-xl border border-stone-100 p-1">
+        <div className="relative bg-white rounded-full shadow-xl border border-store-ink/10 p-1">
           <input
             type="text"
             value={searchQuery}
@@ -140,7 +141,7 @@ export default function FAQsPage() {
             placeholder="Search furniture FAQs..."
             className="w-full pl-12 pr-4 py-4 border-0 rounded-full focus:ring-2 focus:ring-stone-500 focus:border-transparent text-sm bg-transparent"
           />
-          <i className="ri-search-line absolute left-4 top-1/2 transform -translate-y-1/2 text-stone-400 text-xl" />
+          <i className="ri-search-line absolute left-4 top-1/2 transform -translate-y-1/2 text-store-muted text-xl" />
         </div>
       </div>
 
@@ -152,8 +153,8 @@ export default function FAQsPage() {
               onClick={() => setActiveCategory(category.id)}
               className={`flex items-center gap-2 px-6 py-3 rounded-full font-medium transition-all whitespace-nowrap ${
                 activeCategory === category.id
-                  ? 'bg-stone-900 text-white shadow-lg'
-                  : 'bg-stone-100 text-stone-700 hover:bg-stone-200'
+                  ? 'bg-store-ink text-white shadow-lg'
+                  : 'bg-white text-store-ink border border-store-ink/10 hover:border-store-gold'
               }`}
             >
               <i className={`${category.icon} text-lg`}></i>
@@ -167,13 +168,13 @@ export default function FAQsPage() {
             {filteredFAQs.map((faq) => (
               <details
                 key={faq.question}
-                className="bg-white border border-stone-200 overflow-hidden hover:shadow-lg transition-shadow"
+                className="bg-white border border-store-ink/10 overflow-hidden hover:shadow-lg transition-shadow"
               >
-                <summary className="px-6 py-5 font-medium text-stone-900 cursor-pointer hover:bg-stone-50 transition-colors flex items-center justify-between">
+                <summary className="px-6 py-5 font-medium text-store-ink cursor-pointer hover:bg-black/[0.02] transition-colors flex items-center justify-between">
                   <span className="flex-1 pr-4">{faq.question}</span>
-                  <i className="ri-arrow-down-s-line text-xl text-stone-400"></i>
+                  <i className="ri-arrow-down-s-line text-xl text-store-muted"></i>
                 </summary>
-                <div className="px-6 pb-5 text-stone-600 leading-relaxed border-t border-stone-100 pt-4">
+                <div className="px-6 pb-5 text-store-muted leading-relaxed border-t border-store-ink/10 pt-4">
                   {faq.answer}
                 </div>
               </details>
@@ -181,22 +182,22 @@ export default function FAQsPage() {
           </div>
         ) : (
           <div className="text-center py-16">
-            <h3 className="text-xl font-bold text-stone-900 mb-2">No results found</h3>
-            <p className="text-stone-600">Try another search or browse a different category</p>
+            <h3 className="text-xl font-bold text-store-ink mb-2">No results found</h3>
+            <p className="text-store-muted">Try another search or browse a different category</p>
           </div>
         )}
       </div>
 
-      <div className="bg-stone-900 py-16">
+      <div className="bg-store-ink py-16">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl font-serif text-white mb-4">Still deciding on a piece?</h2>
-          <p className="text-xl text-stone-300 mb-8 leading-relaxed">
+          <p className="text-xl text-white/70 mb-8 leading-relaxed">
             Send a WhatsApp message with the product name or a room photo — we will help you choose.
           </p>
           <div className="flex flex-wrap gap-4 justify-center">
             <Link
               href="/contact"
-              className="inline-flex items-center gap-2 bg-amber-100 text-stone-900 px-8 py-4 font-medium hover:bg-white transition-colors whitespace-nowrap"
+              className="inline-flex items-center gap-2 bg-store-gold text-store-ink px-8 py-4 font-medium hover:bg-white transition-colors whitespace-nowrap"
             >
               <i className="ri-mail-line text-lg"></i>
               Contact us
@@ -206,7 +207,7 @@ export default function FAQsPage() {
                 href={`https://wa.me/${waDigits.startsWith('0') ? `233${waDigits.slice(1)}` : waDigits}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 bg-emerald-600 text-white px-8 py-4 font-medium hover:bg-emerald-500 transition-colors whitespace-nowrap"
+                className="inline-flex items-center gap-2 bg-store-gold text-store-ink px-8 py-4 font-medium hover:bg-store-goldDark transition-colors whitespace-nowrap"
               >
                 <i className="ri-whatsapp-line text-lg"></i>
                 WhatsApp

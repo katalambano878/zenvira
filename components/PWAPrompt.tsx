@@ -54,8 +54,8 @@ export default function PWAPrompt() {
           <div className="px-6 pb-8">
             {/* App icon and info */}
             <div className="flex items-center gap-4 mb-6">
-              <div className="w-16 h-16 rounded-2xl shadow-lg flex-shrink-0 bg-blue-700 flex items-center justify-center overflow-hidden">
-                <img src="/logo.png" alt="" className="w-12 h-12 object-contain" />
+              <div className="w-16 h-16 rounded-2xl shadow-lg flex-shrink-0 bg-white border border-stone-200 flex items-center justify-center overflow-hidden p-1.5">
+                <img src="/logo.png" alt="" className="w-full h-full object-contain" />
               </div>
               <div className="flex-1 min-w-0">
                 <h3 className="font-bold text-gray-900 text-lg truncate">{getSiteName()}</h3>
@@ -80,8 +80,8 @@ export default function PWAPrompt() {
                   key={feature.label}
                   className="bg-gray-50 rounded-xl p-3 text-center"
                 >
-                  <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-2">
-                    <i className={`${feature.icon} text-blue-700 text-lg`} />
+                  <div className="w-10 h-10 bg-store-gold/15 rounded-full flex items-center justify-center mx-auto mb-2">
+                    <i className={`${feature.icon} text-store-gold text-lg`} />
                   </div>
                   <span className="text-xs font-medium text-gray-600">{feature.label}</span>
                 </div>
@@ -91,7 +91,7 @@ export default function PWAPrompt() {
             {/* CTA */}
             <button
               onClick={handleInstall}
-              className="w-full bg-blue-700 hover:bg-blue-800 text-white py-4 px-6 rounded-2xl font-semibold text-base transition-all active:scale-[0.98] shadow-lg shadow-blue-700/20 flex items-center justify-center gap-2"
+              className="w-full bg-store-gold hover:bg-store-goldDark text-white py-4 px-6 rounded-2xl font-semibold text-base transition-all active:scale-[0.98] shadow-lg shadow-store-gold/20 flex items-center justify-center gap-2"
             >
               <i className="ri-download-2-line text-xl" />
               Add to Home Screen

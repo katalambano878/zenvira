@@ -17,7 +17,7 @@ export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
   maximumScale: 5,
-  themeColor: '#535C4E',
+  themeColor: '#C9A227',
 };
 
 const siteUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://example.com';
@@ -53,10 +53,13 @@ export const metadata: Metadata = {
   },
   icons: {
     icon: [
-      { url: '/logo.png', sizes: 'any', type: 'image/png' },
+      { url: '/favicon-32.png', sizes: '32x32', type: 'image/png' },
+      { url: '/favicon-16.png', sizes: '16x16', type: 'image/png' },
+      { url: '/icon-192.png', sizes: '192x192', type: 'image/png' },
+      { url: '/icon-512.png', sizes: '512x512', type: 'image/png' },
     ],
-    shortcut: '/logo.png',
-    apple: '/logo.png',
+    shortcut: '/favicon-32.png',
+    apple: '/apple-touch-icon.png',
   },
   manifest: '/manifest.json',
   appleWebApp: {
@@ -81,7 +84,7 @@ export const metadata: Metadata = {
     siteName,
     images: [
       {
-        url: "/logo.png",
+        url: "/og-image.png",
         width: 1200,
         height: 630,
         alt: `${siteName} — ${getSiteTagline()}`,
@@ -93,7 +96,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: titleSuffix,
     description: metaDesc,
-    images: ["/logo.png"],
+    images: ["/og-image.png"],
   },
   alternates: {
     canonical: siteUrl,
@@ -111,6 +114,7 @@ function buildOrganizationJsonLd(): Record<string, unknown> {
     name: siteName,
     url: siteUrl,
     logo: `${siteUrl.replace(/\/$/, '')}/logo.png`,
+    image: `${siteUrl.replace(/\/$/, '')}/og-image.png`,
     description: metaDesc,
   };
   const addr = getContactAddress();
@@ -142,19 +146,21 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-        <meta name="theme-color" content="#535C4E" />
+        <meta name="theme-color" content="#C9A227" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
         <meta name="apple-mobile-web-app-title" content={siteName} />
         <meta name="mobile-web-app-capable" content="yes" />
-        <meta name="msapplication-TileColor" content="#535C4E" />
+        <meta name="msapplication-TileColor" content="#0A0A0A" />
         <meta name="msapplication-tap-highlight" content="no" />
 
-        <link rel="icon" href="/logo.png" type="image/png" sizes="any" />
-        <link rel="shortcut icon" href="/logo.png" />
-
-        <link rel="apple-touch-icon" href="/logo.png" />
-        <link rel="apple-touch-startup-image" href="/logo.png" />
+        <link rel="icon" href="/favicon.ico" sizes="any" />
+        <link rel="icon" href="/favicon-32.png" type="image/png" sizes="32x32" />
+        <link rel="icon" href="/favicon-16.png" type="image/png" sizes="16x16" />
+        <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+        <link rel="apple-touch-startup-image" href="/apple-touch-icon.png" />
+        <meta property="og:image" content={`${siteUrl.replace(/\/$/, '')}/og-image.png`} />
+        <meta name="twitter:image" content={`${siteUrl.replace(/\/$/, '')}/og-image.png`} />
 
         <link
           href="https://cdn.jsdelivr.net/npm/remixicon@4.1.0/fonts/remixicon.css"
@@ -202,7 +208,7 @@ export default function RootLayout({
       <body className="antialiased font-sans overflow-x-hidden pwa-body">
         <a
           href="#main-content"
-          className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[10000] focus:px-6 focus:py-3 focus:bg-blue-600 focus:text-white focus:rounded-lg focus:font-semibold focus:shadow-lg"
+          className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[10000] focus:px-6 focus:py-3 focus:bg-store-gold focus:text-white focus:rounded-lg focus:font-semibold focus:shadow-lg"
         >
           Skip to main content
         </a>

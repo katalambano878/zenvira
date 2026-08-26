@@ -1,4 +1,20 @@
-/** Curated lifestyle imagery for Sika Homes storefront (Unsplash). */
+/** Curated lifestyle imagery for Sika Homes storefront. */
+
+/** Generated page heroes (local) — furniture & interiors, gold/black/white mood. */
+export const PAGE_HEROES = {
+  shop: '/heroes/hero-shop.png',
+  categories: '/heroes/hero-categories.png',
+  about: '/heroes/hero-about.png',
+  contact: '/heroes/hero-contact.png',
+  support: '/heroes/hero-support.png',
+  shipping: '/heroes/hero-shipping.png',
+  blog: '/heroes/hero-blog.png',
+  wishlist: '/heroes/hero-wishlist.png',
+  cart: '/heroes/hero-cart.png',
+  legal: '/heroes/hero-legal.png',
+} as const;
+
+/** Remote Unsplash lifestyle shots used on the homepage and room cards. */
 export const SIKA_IMAGES = {
   heroLiving:
     'https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&w=1600&q=80',

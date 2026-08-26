@@ -5,6 +5,7 @@ import Link from 'next/link';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import PageHero from '@/components/PageHero';
+import { PAGE_HEROES } from '@/lib/furniture-images';
 
 const categories = [
   {
@@ -118,7 +119,7 @@ export default function HelpCenterPage() {
         <PageHero
           title="How can we help you?"
           subtitle="Search our help center or browse by category"
-          backgroundImage="/logo.png"
+          backgroundImage={PAGE_HEROES.support}
         />
         <div className="max-w-2xl mx-auto px-4 -mt-16 relative z-20 pb-8">
           <div className="relative">
@@ -127,7 +128,7 @@ export default function HelpCenterPage() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search for articles..."
-              className="w-full px-6 py-4 pl-14 rounded-xl text-gray-900 text-lg focus:outline-none focus:ring-4 focus:ring-blue-300 shadow-xl border border-gray-100 bg-white"
+              className="w-full px-6 py-4 pl-14 rounded-xl text-gray-900 text-lg focus:outline-none focus:ring-4 focus:ring-store-gold/40 shadow-xl border border-gray-100 bg-white"
             />
               <i className="ri-search-line absolute left-5 top-1/2 -translate-y-1/2 text-2xl text-gray-400"></i>
               {searchQuery && (
@@ -172,7 +173,7 @@ export default function HelpCenterPage() {
             {selectedCategory && (
               <button
                 onClick={() => setSelectedCategory(null)}
-                className="text-blue-700 hover:text-blue-900 font-semibold whitespace-nowrap"
+                className="text-store-gold hover:text-store-ink font-semibold whitespace-nowrap"
               >
                 <i className="ri-arrow-left-line mr-2"></i>
                 All Categories
@@ -185,10 +186,10 @@ export default function HelpCenterPage() {
               <button
                 key={category.id}
                 onClick={() => setSelectedCategory(category.id)}
-                className="bg-white rounded-xl shadow-sm p-6 text-left hover:shadow-lg transition-all border-2 border-transparent hover:border-blue-700"
+                className="bg-white rounded-xl shadow-sm p-6 text-left hover:shadow-lg transition-all border-2 border-transparent hover:border-store-gold"
               >
-                <div className="w-14 h-14 flex items-center justify-center bg-blue-100 rounded-xl mb-4">
-                  <i className={`${category.icon} text-3xl text-blue-700`}></i>
+                <div className="w-14 h-14 flex items-center justify-center bg-store-gold/15 rounded-xl mb-4">
+                  <i className={`${category.icon} text-3xl text-store-gold`}></i>
                 </div>
                 <h3 className="text-xl font-bold text-gray-900 mb-2">{category.title}</h3>
                 <p className="text-gray-600">{category.count} articles</p>
@@ -199,7 +200,7 @@ export default function HelpCenterPage() {
                       <Link
                         key={article.id}
                         href={`/help/article/${article.id}`}
-                        className="block text-sm text-gray-700 hover:text-blue-700 font-medium"
+                        className="block text-sm text-gray-700 hover:text-store-gold font-medium"
                       >
                         • {article.title}
                       </Link>
@@ -220,7 +221,7 @@ export default function HelpCenterPage() {
                   className="flex items-center justify-between p-4 hover:bg-gray-50 rounded-lg transition-colors"
                 >
                   <div className="flex items-center space-x-4">
-                    <div className="w-10 h-10 flex items-center justify-center bg-blue-100 text-blue-700 rounded-full font-bold">
+                    <div className="w-10 h-10 flex items-center justify-center bg-store-gold/15 text-store-gold rounded-full font-bold">
                       {index + 1}
                     </div>
                     <div>
@@ -242,24 +243,24 @@ export default function HelpCenterPage() {
               href="/support/ticket"
               className="bg-white rounded-xl shadow-sm p-6 hover:shadow-lg transition-all text-center"
             >
-              <div className="w-16 h-16 flex items-center justify-center bg-blue-100 rounded-full mx-auto mb-4">
-                <i className="ri-customer-service-2-line text-3xl text-blue-700"></i>
+              <div className="w-16 h-16 flex items-center justify-center bg-store-gold/15 rounded-full mx-auto mb-4">
+                <i className="ri-customer-service-2-line text-3xl text-store-gold"></i>
               </div>
               <h3 className="text-lg font-bold text-gray-900 mb-2">Contact Support</h3>
               <p className="text-gray-600 text-sm mb-4">Get help from our support team</p>
-              <span className="text-blue-700 font-semibold whitespace-nowrap">Create Ticket →</span>
+              <span className="text-store-gold font-semibold whitespace-nowrap">Create Ticket →</span>
             </Link>
 
             <Link
               href="/returns"
               className="bg-white rounded-xl shadow-sm p-6 hover:shadow-lg transition-all text-center"
             >
-              <div className="w-16 h-16 flex items-center justify-center bg-purple-100 rounded-full mx-auto mb-4">
-                <i className="ri-arrow-left-right-line text-3xl text-purple-700"></i>
+              <div className="w-16 h-16 flex items-center justify-center bg-store-gold/15 rounded-full mx-auto mb-4">
+                <i className="ri-arrow-left-right-line text-3xl text-store-gold"></i>
               </div>
               <h3 className="text-lg font-bold text-gray-900 mb-2">Start a Return</h3>
               <p className="text-gray-600 text-sm mb-4">Return or exchange your item</p>
-              <span className="text-purple-700 font-semibold whitespace-nowrap">Initiate Return →</span>
+              <span className="text-store-gold font-semibold whitespace-nowrap">Initiate Return →</span>
             </Link>
 
             <Link

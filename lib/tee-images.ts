@@ -1,6 +1,6 @@
 /** Placeholder image paths — furniture catalog uses category/product uploads instead. */
 export const FURNITURE_IMAGES = {
-  roomFallback: '/logo.png',
+  roomFallback: '/heroes/hero-categories.png',
 } as const;
 
 /** @deprecated tee branding removed — kept for any residual imports */

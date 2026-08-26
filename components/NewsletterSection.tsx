@@ -28,12 +28,12 @@ export default function NewsletterSection() {
   };
 
   return (
-    <div className="rounded-[2rem] bg-store-sand border border-stone-200/80 px-6 sm:px-10 py-12 md:py-14 text-center">
-      <p className="text-xs tracking-[0.2em] uppercase text-store-muted mb-3">Stay inspired</p>
-      <h3 className="font-serif text-3xl sm:text-4xl text-store-ink mb-3">
+    <div className="rounded-[2rem] bg-store-ink px-6 sm:px-10 py-12 md:py-14 text-center">
+      <p className="text-xs tracking-[0.2em] uppercase text-store-gold mb-3">Stay inspired</p>
+      <h3 className="font-serif text-3xl sm:text-4xl text-white mb-3">
         Get 10% off your first order
       </h3>
-      <p className="text-store-muted text-sm max-w-md mx-auto mb-8 leading-relaxed">
+      <p className="text-white/60 text-sm max-w-md mx-auto mb-8 leading-relaxed">
         New sofas, room looks and delivery tips for furnishing your Ghana home — straight to your inbox.
       </p>
       <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-3 max-w-lg mx-auto">
@@ -43,21 +43,21 @@ export default function NewsletterSection() {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           placeholder="Enter your email"
-          className="flex-1 rounded-full border border-stone-300 bg-white px-5 py-3.5 text-sm focus:outline-none focus:ring-2 focus:ring-store-sage/25 focus:border-store-sage"
+          className="flex-1 rounded-full border border-white/20 bg-white px-5 py-3.5 text-sm text-store-ink focus:outline-none focus:ring-2 focus:ring-store-gold/40 focus:border-store-gold"
         />
         <button
           type="submit"
           disabled={isSubmitting}
-          className="rounded-full bg-store-sage px-7 py-3.5 text-sm font-medium text-white hover:bg-store-sageDark transition-colors disabled:opacity-60"
+          className="rounded-full bg-store-gold px-7 py-3.5 text-sm font-medium text-store-ink hover:bg-white transition-colors disabled:opacity-60"
         >
           {isSubmitting ? 'Subscribing…' : 'Subscribe'}
         </button>
       </form>
       {submitStatus === 'success' && (
-        <p className="mt-4 text-sm text-store-sage">You&apos;re on the list — thank you.</p>
+        <p className="mt-4 text-sm text-store-gold">You&apos;re on the list — thank you.</p>
       )}
       {submitStatus === 'error' && (
-        <p className="mt-4 text-sm text-red-700">Something went wrong. Please try again.</p>
+        <p className="mt-4 text-sm text-red-300">Something went wrong. Please try again.</p>
       )}
     </div>
   );

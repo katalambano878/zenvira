@@ -6,7 +6,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { api } from '@/lib/api';
 import { useRecaptcha } from '@/hooks/useRecaptcha';
-import { getWordmark, getSiteName } from '@/lib/site-defaults';
+import { getSiteName } from '@/lib/site-defaults';
 
 export default function AdminLoginPage() {
   const router = useRouter();
@@ -48,14 +48,20 @@ export default function AdminLoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-gray-50 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-white via-white to-gray-50 flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <Link href="/" className="inline-block">
-            <Image src="/logo.png" alt={getSiteName()} width={64} height={64} className="mx-auto mb-4 object-contain" />
-            <p className="font-['Pacifico'] text-4xl text-blue-700 text-center">{getWordmark()}</p>
+            <Image
+              src="/logo.png"
+              alt={getSiteName()}
+              width={220}
+              height={140}
+              className="mx-auto mb-2 object-contain"
+              priority
+            />
           </Link>
-          <h1 className="text-3xl font-bold text-gray-900 mt-6 mb-2">Admin Login</h1>
+          <h1 className="text-2xl font-bold text-gray-900 mt-4 mb-2">Admin Login</h1>
           <p className="text-gray-600">Sign in to access the admin dashboard</p>
         </div>
 
@@ -81,7 +87,7 @@ export default function AdminLoginPage() {
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full pl-12 pr-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full pl-12 pr-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-store-gold focus:border-store-gold"
                   placeholder="admin@example.com"
                   required
                 />
@@ -98,7 +104,7 @@ export default function AdminLoginPage() {
                   type={showPassword ? 'text' : 'password'}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full pl-12 pr-12 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full pl-12 pr-12 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-store-gold focus:border-store-gold"
                   placeholder="Enter your password"
                   required
                 />
@@ -115,7 +121,7 @@ export default function AdminLoginPage() {
             <button
               type="submit"
               disabled={isLoading || verifying}
-              className="w-full bg-blue-700 hover:bg-blue-800 text-white py-3 rounded-lg font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
+              className="w-full bg-store-gold hover:bg-store-goldDark text-white py-3 rounded-lg font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
             >
               {isLoading || verifying ? (
                 <span className="flex items-center justify-center space-x-2">
@@ -132,7 +138,7 @@ export default function AdminLoginPage() {
         </div>
 
         <div className="mt-6 text-center">
-          <Link href="/" className="text-sm text-gray-600 hover:text-blue-700 transition-colors whitespace-nowrap">
+          <Link href="/" className="text-sm text-gray-600 hover:text-store-gold transition-colors whitespace-nowrap">
             <i className="ri-arrow-left-line mr-2"></i>
             Back to Store
           </Link>

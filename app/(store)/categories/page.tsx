@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import PageHero from '@/components/PageHero';
+import { PAGE_HEROES } from '@/lib/furniture-images';
 import { listCategories } from '@/lib/data/products';
 
 export const dynamic = 'force-dynamic';
@@ -22,12 +23,12 @@ export default async function CategoriesPage() {
   }
 
   const palette = [
-    { color: 'from-blue-500 to-blue-700', icon: 'ri-store-2-line' },
-    { color: 'from-blue-500 to-blue-700', icon: 'ri-shopping-bag-3-line' },
-    { color: 'from-purple-500 to-purple-700', icon: 'ri-t-shirt-line' },
-    { color: 'from-amber-500 to-amber-700', icon: 'ri-home-smile-line' },
-    { color: 'from-rose-500 to-rose-700', icon: 'ri-heart-line' },
-    { color: 'from-indigo-500 to-indigo-700', icon: 'ri-star-smile-line' },
+    { color: 'from-store-gold to-store-ink', icon: 'ri-store-2-line' },
+    { color: 'from-store-gold to-store-ink', icon: 'ri-shopping-bag-3-line' },
+    { color: 'from-store-ink to-store-goldDark', icon: 'ri-t-shirt-line' },
+    { color: 'from-store-goldDark to-store-ink', icon: 'ri-home-smile-line' },
+    { color: 'from-store-ink to-store-gold', icon: 'ri-heart-line' },
+    { color: 'from-store-ink to-store-goldDark', icon: 'ri-star-smile-line' },
   ];
 
   const categories =
@@ -47,7 +48,7 @@ export default async function CategoriesPage() {
       <PageHero
         title="Shop by Category"
         subtitle="Browse product categories"
-        backgroundImage="/logo.png"
+        backgroundImage={PAGE_HEROES.categories}
       />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
@@ -80,7 +81,7 @@ export default async function CategoriesPage() {
                   <p className="text-gray-600 leading-relaxed text-sm mb-4 line-clamp-2">
                     {category.description || 'Explore our exclusive collection in this category.'}
                   </p>
-                  <div className="flex items-center text-blue-700 font-medium text-sm group-hover:gap-2 transition-all">
+                  <div className="flex items-center text-store-gold font-medium text-sm group-hover:gap-2 transition-all">
                     <span>Browse Collection</span>
                     <i className="ri-arrow-right-line ml-2"></i>
                   </div>
@@ -96,23 +97,23 @@ export default async function CategoriesPage() {
         )}
       </div>
 
-      <div className="bg-gradient-to-br from-blue-700 to-blue-900 py-16">
+      <div className="bg-gradient-to-br from-store-ink to-black py-16">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-4xl font-bold text-white mb-4">Can't Find What You're Looking For?</h2>
-          <p className="text-xl text-blue-100 mb-8 leading-relaxed">
+          <p className="text-xl text-white/80 mb-8 leading-relaxed">
             Try our advanced search or contact our team for personalised product recommendations
           </p>
           <div className="flex flex-wrap gap-4 justify-center">
             <Link
               href="/shop"
-              className="inline-flex items-center gap-2 bg-white text-blue-700 px-8 py-4 rounded-full font-medium hover:bg-blue-50 transition-colors whitespace-nowrap"
+              className="inline-flex items-center gap-2 bg-white text-store-gold px-8 py-4 rounded-full font-medium hover:bg-store-gold/10 transition-colors whitespace-nowrap"
             >
               <i className="ri-search-line"></i>
               Search All Products
             </Link>
             <Link
               href="/contact"
-              className="inline-flex items-center gap-2 bg-blue-600 text-white px-8 py-4 rounded-full font-medium hover:bg-blue-500 transition-colors whitespace-nowrap"
+              className="inline-flex items-center gap-2 bg-store-gold text-white px-8 py-4 rounded-full font-medium hover:bg-store-gold/100 transition-colors whitespace-nowrap"
             >
               <i className="ri-customer-service-line"></i>
               Contact Support

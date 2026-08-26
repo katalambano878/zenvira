@@ -15,8 +15,8 @@ const ADMIN_EMAIL =
 const EMAIL_FROM = process.env.EMAIL_FROM || getServerEmailFrom();
 const BRAND = {
     name: getSiteName(),
-    color: '#2563eb',
-    colorLight: '#eff6ff',
+    color: '#C9A227',
+    colorLight: '#F7F1DE',
     colorDark: '#064e3b',
     url: getAppUrl(),
     phone: process.env.NEXT_PUBLIC_SITE_PHONE || '',
@@ -369,8 +369,8 @@ export async function sendOrderStatusUpdate(order: any, newStatus: string) {
 
     // Status icons/colors
     const statusConfig: Record<string, { icon: string; color: string; bg: string }> = {
-        processing: { icon: '&#9881;', color: '#2563eb', bg: '#eff6ff' },
-        shipped: { icon: '&#128666;', color: '#2563eb', bg: '#eff6ff' },
+        processing: { icon: '&#9881;', color: '#C9A227', bg: '#F7F1DE' },
+        shipped: { icon: '&#128666;', color: '#C9A227', bg: '#F7F1DE' },
         delivered: { icon: '&#127881;', color: '#16a34a', bg: '#f0fdf4' },
         cancelled: { icon: '&#10060;', color: '#dc2626', bg: '#fef2f2' },
     };
@@ -471,9 +471,9 @@ export async function sendNewsletterWelcome(email: string) {
         html: emailLayout(`
 <h2 style="margin:0 0 16px;color:#111827;font-size:22px;text-align:center;">Welcome to The Insider Club</h2>
 <p style="color:#374151;font-size:14px;line-height:1.7;margin:16px 0;">Thanks for subscribing. Use this code on your <strong>first order</strong>:</p>
-<div style="background-color:#f0f9ff;border:2px dashed #0ea5e9;border-radius:12px;padding:20px;margin:24px 0;text-align:center;">
+<div style="background-color:#F7F1DE;border:2px dashed #C9A227;border-radius:12px;padding:20px;margin:24px 0;text-align:center;">
   <p style="margin:0 0 8px;color:#0369a1;font-size:12px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;">Your code</p>
-  <p style="margin:0;color:#0c4a6e;font-size:28px;font-weight:800;letter-spacing:0.15em;">${safeCode}</p>
+  <p style="margin:0;color:#0A0A0A;font-size:28px;font-weight:800;letter-spacing:0.15em;">${safeCode}</p>
   <p style="margin:12px 0 0;color:#64748b;font-size:13px;">10% off your first order</p>
 </div>
 <p style="color:#374151;font-size:14px;line-height:1.7;margin:0 0 16px;">You'll also get updates on new arrivals, restocks, and exclusive deals.</p>

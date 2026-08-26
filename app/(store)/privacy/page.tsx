@@ -1,4 +1,5 @@
 import PageHero from '@/components/PageHero';
+import { PAGE_HEROES } from '@/lib/furniture-images';
 import { getSiteName, getContactEmail } from '@/lib/site-defaults';
 
 export default function PrivacyPage() {
@@ -10,7 +11,7 @@ export default function PrivacyPage() {
       <PageHero
         title="Privacy Policy"
         subtitle="Placeholder policy — replace before launch."
-        backgroundImage="/logo.png"
+        backgroundImage={PAGE_HEROES.legal}
       />
 
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
@@ -25,7 +26,7 @@ export default function PrivacyPage() {
           </p>
           <p>
             Privacy inquiries:{' '}
-            <a href={`mailto:${contactEmail}`} className="text-blue-700 hover:underline">
+            <a href={`mailto:${contactEmail}`} className="text-store-gold hover:underline">
               {contactEmail}
             </a>
             .

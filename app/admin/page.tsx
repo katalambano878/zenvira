@@ -19,7 +19,7 @@ export default function AdminDashboard() {
       change: '0%', // Placeholder trend
       trend: 'up',
       icon: 'ri-money-dollar-circle-line',
-      color: 'blue'
+      color: 'amber'
     },
     {
       title: 'Orders',
@@ -27,7 +27,7 @@ export default function AdminDashboard() {
       change: '0%',
       trend: 'up',
       icon: 'ri-shopping-bag-line',
-      color: 'blue'
+      color: 'amber'
     },
     {
       title: 'Customers', // This is total active users for us currently
@@ -35,7 +35,7 @@ export default function AdminDashboard() {
       change: '0%',
       trend: 'up',
       icon: 'ri-group-line',
-      color: 'purple'
+      color: 'amber'
     },
     {
       title: 'Avg Order Value',
@@ -98,7 +98,7 @@ export default function AdminDashboard() {
             change: '+0%', // Dynamic change requires date filtering logic which is complex
             trend: 'up',
             icon: 'ri-money-dollar-circle-line',
-            color: 'blue'
+            color: 'amber'
           },
           {
             title: 'Orders',
@@ -106,7 +106,7 @@ export default function AdminDashboard() {
             change: '+0%',
             trend: 'up',
             icon: 'ri-shopping-bag-line',
-            color: 'blue'
+            color: 'amber'
           },
           {
             title: 'Customers (Active)',
@@ -114,7 +114,7 @@ export default function AdminDashboard() {
             change: '+0%',
             trend: 'up',
             icon: 'ri-group-line',
-            color: 'purple'
+            color: 'amber'
           },
           {
             title: 'Avg Order Value',
@@ -234,7 +234,7 @@ export default function AdminDashboard() {
           {stats.map((stat) => (
             <div key={stat.title} className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow">
               <div className="flex items-center justify-between mb-4">
-                <div className={`w-12 h-12 flex items-center justify-center bg-${stat.color}-100 text-${stat.color}-700 rounded-lg`}>
+                <div className="w-12 h-12 flex items-center justify-center bg-store-gold/15 text-store-gold rounded-lg">
                   <i className={`${stat.icon} text-2xl`}></i>
                 </div>
                 <span className={`text-sm font-semibold text-store-ink`}>

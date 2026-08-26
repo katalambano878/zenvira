@@ -43,7 +43,7 @@ const COLOR_HEX: Record<string, string> = {
   rose: '#f43f5e',
   wine: '#722f37',
   charcoal: '#374151',
-  sky: '#0ea5e9',
+  sky: '#C9A227',
 };
 
 export function colorNameToHex(name: string): string {

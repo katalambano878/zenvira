@@ -4,6 +4,8 @@ import Link from 'next/link';
 import { useCMS } from '@/context/CMSContext';
 import { usePageTitle } from '@/hooks/usePageTitle';
 import { getSiteName, getSiteTagline } from '@/lib/site-defaults';
+import PageHero from '@/components/PageHero';
+import { PAGE_HEROES } from '@/lib/furniture-images';
 
 export default function AboutPage() {
   usePageTitle('About');
@@ -35,14 +37,15 @@ export default function AboutPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-store-cream">
-      <section className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-10 pt-16 pb-12 text-center">
-        <p className="text-xs tracking-[0.2em] uppercase text-store-muted mb-3">About us</p>
-        <h1 className="font-serif text-4xl sm:text-5xl text-store-ink mb-4">{siteName}</h1>
-        <p className="text-store-muted max-w-xl mx-auto text-lg">{tagline}</p>
-      </section>
+    <div className="min-h-screen bg-white">
+      <PageHero
+        title={siteName}
+        subtitle={tagline}
+        backgroundImage={PAGE_HEROES.about}
+        eyebrow="About us"
+      />
 
-      <section className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-10 pb-20">
+      <section className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-10 py-20">
         <div className="grid lg:grid-cols-2 gap-12 items-center bg-white rounded-[2rem] border border-stone-200/80 p-8 md:p-12 shadow-soft">
           <div>
             <h2 className="font-serif text-3xl text-store-ink mb-5">Who we are</h2>
@@ -57,10 +60,17 @@ export default function AboutPage() {
               </p>
             </div>
           </div>
-          <div className="aspect-[4/3] rounded-3xl bg-store-sage flex items-end p-8 text-white">
-            <div>
-              <p className="font-serif text-3xl mb-2">{siteName}</p>
-              <p className="text-white/80 text-sm max-w-sm">Furniture, sofas & interiors — furnish every room beautifully.</p>
+          <div
+            className="aspect-[4/3] rounded-3xl bg-cover bg-center relative overflow-hidden"
+            style={{ backgroundImage: `url(${PAGE_HEROES.about})` }}
+          >
+            <div className="absolute inset-0 bg-store-ink/55 flex items-end p-8">
+              <div>
+                <p className="font-serif text-3xl mb-2 text-store-gold">{siteName}</p>
+                <p className="text-white/80 text-sm max-w-sm">
+                  Furniture, sofas & interiors — furnish every room beautifully.
+                </p>
+              </div>
             </div>
           </div>
         </div>
@@ -74,8 +84,8 @@ export default function AboutPage() {
           </div>
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
             {values.map((v) => (
-              <div key={v.title} className="rounded-2xl border border-stone-200 bg-store-cream p-6">
-                <div className="w-11 h-11 rounded-full bg-white border border-stone-200 flex items-center justify-center mb-4 text-store-sage">
+              <div key={v.title} className="rounded-2xl border border-stone-200 bg-white p-6">
+                <div className="w-11 h-11 rounded-full bg-white border border-stone-200 flex items-center justify-center mb-4 text-store-gold">
                   <i className={`${v.icon} text-xl`} />
                 </div>
                 <h3 className="font-medium text-store-ink mb-2">{v.title}</h3>
@@ -93,7 +103,7 @@ export default function AboutPage() {
         </p>
         <Link
           href="/shop"
-          className="inline-flex rounded-full bg-store-sage px-8 py-3.5 text-sm font-medium text-white hover:bg-store-sageDark transition-colors"
+          className="inline-flex rounded-full bg-store-ink px-8 py-3.5 text-sm font-medium text-white hover:bg-store-gold hover:text-store-ink transition-colors"
         >
           Shop furniture
         </Link>

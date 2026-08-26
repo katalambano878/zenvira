@@ -32,7 +32,7 @@ export default function StoreLayout({
         <NavigationProgress />
       </Suspense>
       <ScrollToTop />
-      <div className="min-h-screen bg-store-cream">
+      <div className="min-h-screen bg-white">
         <PWASplash />
         <PWAInstaller />
         <Header />

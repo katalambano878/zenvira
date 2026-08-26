@@ -48,7 +48,7 @@ export default function AnnouncementBar() {
 
     if (visibleBanners.length === 0) {
         return (
-            <div className="bg-blue-800 text-white py-2 text-center text-sm">
+            <div className="bg-store-goldDark text-white py-2 text-center text-sm">
                 <p>
               {process.env.NEXT_PUBLIC_SITE_TAGLINE || 'Online store'} ·{' '}
               {sanitizeAddressDisplay(process.env.NEXT_PUBLIC_CONTACT_ADDRESS) || 'Shop with us'}

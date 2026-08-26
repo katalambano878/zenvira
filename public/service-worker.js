@@ -1,5 +1,5 @@
 // Storefront PWA service worker
-const CACHE_VERSION = 'store-v3.0-pg';
+const CACHE_VERSION = 'store-v3.1-sika-brand';
 const STATIC_CACHE = `static-${CACHE_VERSION}`;
 const DYNAMIC_CACHE = `dynamic-${CACHE_VERSION}`;
 const IMAGE_CACHE = `images-${CACHE_VERSION}`;
@@ -15,6 +15,9 @@ const STATIC_ASSETS = [
   '/categories',
   '/offline',
   '/logo.png',
+  '/icon-192.png',
+  '/icon-512.png',
+  '/manifest.json',
 ];
 
 // Cache size limits
@@ -34,7 +37,7 @@ async function trimCache(cacheName, maxItems) {
 
 // Install: pre-cache static assets
 self.addEventListener('install', (event) => {
-  console.log('[SW] Installing v3.0-pg...');
+  console.log('[SW] Installing v3.1-sika-brand...');
   event.waitUntil(
     caches.open(STATIC_CACHE)
       .then((cache) => {
@@ -89,7 +92,7 @@ self.addEventListener('fetch', (event) => {
       fetch(request)
         .then((response) => response)
         .catch(() => {
-          const html = '<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Admin – Connection required</title><style>body{font-family:system-ui,sans-serif;margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;background:#f8fafc;}.box{text-align:center;max-width:24rem;padding:2rem;}h1{font-size:1.5rem;color:#1e293b;margin-bottom:0.5rem;}p{color:#64748b;margin-bottom:1.5rem;}a{display:inline-block;background:#2563eb;color:#fff;padding:0.75rem 1.5rem;border-radius:0.5rem;text-decoration:none;font-weight:600;}a:hover{background:#1d4ed8;}</style></head><body><div class="box"><h1>Connection required</h1><p>Admin needs an internet connection. Check your network and try again.</p><a href="/admin">Try again</a></div></body></html>';
+          const html = '<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Admin – Connection required</title><style>body{font-family:system-ui,sans-serif;margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;background:#f8fafc;}.box{text-align:center;max-width:24rem;padding:2rem;}h1{font-size:1.5rem;color:#1e293b;margin-bottom:0.5rem;}p{color:#64748b;margin-bottom:1.5rem;}a{display:inline-block;background:#C9A227;color:#fff;padding:0.75rem 1.5rem;border-radius:0.5rem;text-decoration:none;font-weight:600;}a:hover{background:#A8891E;}</style></head><body><div class="box"><h1>Connection required</h1><p>Admin needs an internet connection. Check your network and try again.</p><a href="/admin">Try again</a></div></body></html>';
           return new Response(html, { headers: { 'Content-Type': 'text/html; charset=utf-8' } });
         })
     );

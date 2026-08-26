@@ -1,18 +1,36 @@
 {
-  "name": "New Project",
-  "short_name": "New Project",
-  "description": "Starter e-commerce storefront. Customize via env vars and CMS settings.",
+  "name": "Sika Homes",
+  "short_name": "Sika Homes",
+  "description": "Furniture, sofas & interiors for beautiful homes in Ghana.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",
-  "theme_color": "#2563eb",
+  "theme_color": "#C9A227",
   "orientation": "portrait-primary",
   "icons": [
     {
-      "src": "/logo.png",
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-maskable-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
     }
   ]
 }

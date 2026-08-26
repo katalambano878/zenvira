@@ -227,7 +227,7 @@ export default function ProductsPage() {
           </Link>
           <Link
             href="/admin/products/new"
-            className="px-6 py-3 bg-blue-700 hover:bg-blue-800 text-white rounded-lg font-semibold transition-colors whitespace-nowrap cursor-pointer flex items-center justify-center md:items-start"
+            className="px-6 py-3 bg-store-gold hover:bg-store-goldDark text-white rounded-lg font-semibold transition-colors whitespace-nowrap cursor-pointer flex items-center justify-center md:items-start"
           >
             <i className="ri-add-line mr-2"></i>
             Add Product

@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { sanitizeHtml } from '@/lib/sanitize';
 import { query, queryOne } from '@/lib/db';
+import { PAGE_HEROES } from '@/lib/furniture-images';
 
 export const dynamic = 'force-dynamic';
 
@@ -54,11 +55,11 @@ export default async function BlogPostPage({ params }: { params: Promise<{ id: s
     relatedResult.rows.map((p) => ({
       id: p.id,
       title: p.title,
-      image: p.featured_image || '/logo.png',
+      image: p.featured_image || PAGE_HEROES.blog,
       category: p.tags?.[0] || 'General',
     })) ?? [];
 
-  const heroImage = (post.featured_image as string | null) || '/logo.png';
+  const heroImage = (post.featured_image as string | null) || PAGE_HEROES.blog;
   const category = (post.tags as string[] | null)?.[0] || 'General';
   const published = formatDate(post.published_at as string | null);
 
@@ -68,12 +69,12 @@ export default async function BlogPostPage({ params }: { params: Promise<{ id: s
         <img src={heroImage} alt={post.title as string} className="w-full h-full object-cover opacity-50" />
         <div className="absolute inset-0 flex items-center justify-center">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <span className="inline-block bg-blue-600 text-white px-4 py-2 rounded-full text-sm font-medium mb-4">
+            <span className="inline-block bg-store-gold text-white px-4 py-2 rounded-full text-sm font-medium mb-4">
               {category}
             </span>
             <h1 className="text-5xl font-bold text-white mb-6">{post.title as string}</h1>
             {published && (
-              <div className="flex items-center justify-center gap-6 text-blue-100">
+              <div className="flex items-center justify-center gap-6 text-white/80">
                 <span className="flex items-center gap-2">
                   <i className="ri-calendar-line"></i>
                   {published}
@@ -105,7 +106,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ id: s
                 >
                   <div className="relative h-48">
                     <img src={relatedPost.image} alt={relatedPost.title} className="w-full h-full object-cover" />
-                    <span className="absolute top-4 left-4 bg-blue-700 text-white px-3 py-1 rounded-full text-xs font-medium">
+                    <span className="absolute top-4 left-4 bg-store-gold text-white px-3 py-1 rounded-full text-xs font-medium">
                       {relatedPost.category}
                     </span>
                   </div>
@@ -121,7 +122,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ id: s
         <div className="mt-12 text-center">
           <Link
             href="/blog"
-            className="inline-flex items-center gap-2 text-blue-700 font-medium hover:gap-3 transition-all"
+            className="inline-flex items-center gap-2 text-store-gold font-medium hover:gap-3 transition-all"
           >
             <i className="ri-arrow-left-line"></i>
             Back to Blog

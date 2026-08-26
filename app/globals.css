@@ -4,17 +4,17 @@
 @tailwind utilities;
 
 :root {
-  --sika-cream: #f7f5f0;
-  --sika-sand: #efebe3;
-  --sika-ink: #1a1a1a;
-  --sika-sage: #535c4e;
-  --sika-sage-dark: #3f463a;
+  --sika-white: #ffffff;
+  --sika-black: #0a0a0a;
+  --sika-gold: #c9a227;
+  --sika-gold-dark: #a8891e;
+  --sika-ink: #0a0a0a;
   --sika-muted: #6b6b6b;
 }
 
 @layer base {
   body {
-    @apply bg-store-cream text-store-ink font-sans antialiased;
+    @apply bg-white text-store-ink font-sans antialiased;
   }
 }
 
@@ -630,7 +630,7 @@ img {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #2563eb 0%, #1e40af 50%, #0c4a6e 100%);
+  background: linear-gradient(135deg, #C9A227 0%, #0A0A0A 50%, #0A0A0A 100%);
   animation: splashFadeOut 0.5s ease-out 1.5s forwards;
 }
 
