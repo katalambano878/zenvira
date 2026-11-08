@@ -137,7 +137,10 @@ export default function Footer() {
         </div>
 
         <div className="mt-12 pt-6 border-t border-white/10 flex flex-col sm:flex-row justify-between gap-3 text-xs text-white/40">
-          <p>© {new Date().getFullYear()} {siteName}. All rights reserved.</p>
+          <p>
+            © {new Date().getFullYear()} {siteName}. All rights reserved. Powered by{' '}
+            <a href="https://doctorbarns.com" target="_blank" rel="noopener" className="hover:text-store-gold hover:underline">Doctor Barns Tech</a>
+          </p>
           <div className="flex gap-4">
             <Link href="/privacy" className="hover:text-store-gold">Privacy</Link>
             <Link href="/terms" className="hover:text-store-gold">Terms</Link>
